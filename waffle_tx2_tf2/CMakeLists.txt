@@ -5,6 +5,8 @@ set(CMAKE_CXX_STANDARD 17)
 find_package(catkin REQUIRED COMPONENTS
   roscpp
   tf2
+  tf2_ros
+  tf2_geometry_msgs
   geometry_msgs
   sensor_msgs
 )
@@ -13,6 +15,8 @@ catkin_package(
   CATKIN_DEPENDS
   roscpp
   tf2
+  tf2_ros
+  tf2_geometry_msgs
   geometry_msgs
   sensor_msgs
 )

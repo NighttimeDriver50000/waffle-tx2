@@ -11,11 +11,11 @@ tf2::Transform current;
 void correctionCallback(const geometry_msgs::TransformStamped::ConstPtr& msg)
 {
   tf2::Transform offset;
-  tf2::fromMsg(msg.transform, offset);
+  tf2::fromMsg(msg->transform, offset);
   current *= offset;
   // Stamp and send the transform.
   geometry_msgs::TransformStamped stamped;
-  stamped.header.stamp = msg.header.stamp;
+  stamped.header.stamp = msg->header.stamp;
   stamped.header.frame_id = "map";
   stamped.child_frame_id = "odom";
   stamped.transform = tf2::toMsg(current);
