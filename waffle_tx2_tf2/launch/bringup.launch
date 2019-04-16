@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+<launch>
+  <include file="$(find waffle_tx2_tf2)/launch/tb3.launch"/>
+  <include file="$(find waffle_tx2_tf2)/launch/zed.launch"/>
+  <include file="$(find waffle_tx2_tf2)/launch/tf2.launch"/>
+</launch>

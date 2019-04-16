@@ -1,0 +1,35 @@
+<?xml version="1.0"?>
+<launch>
+  <arg name="camera_model" default="0"/><!-- 0=ZED, 1=ZEDM -->
+
+  <arg name="resolution" default="2"/>
+  <!-- 0=RESOLUTION_HD2K, 1=RESOLUTION_HD1080,
+       2=RESOLUTION_HD720, 3=RESOLUTION_VGA -->
+
+  <arg name="frame_rate" default="30"/>
+  <!-- RESOLUTION_HD2K   -> 2208*1242, available framerates: 15 fps.
+       RESOLUTION_HD1080 -> 1920*1080, available framerates: 15, 30 fps.
+       RESOLUTION_HD720  -> 1280*720,  available framerates: 15, 30, 60 fps.
+       RESOLUTION_VGA    -> 672*376,   available framerates: 15, 30, 60, 100 fps. -->
+
+  <arg name="publish_tf" default="true"/>
+  <arg name="publish_map_tf" default="true"/>
+  <arg name="publish_urdf" default="true"/>
+  <arg name="pose_frame" default="zed_map"/>
+  <arg name="odometry_frame" default="zed_odom"/>
+  <arg name="camera_flip" default="true"/>
+
+  <group ns="zed">
+    <include file="$(find zed_wrapper)/launch/zed_camera.launch">
+      <arg name="camera_model" value="$(arg camera_model)"/>
+      <arg name="resolution" value="$(arg resolution)"/>
+      <arg name="frame_rate" value="$(arg frame_rate)"/>
+      <arg name="publish_tf" value="$(arg publish_tf)"/>
+      <arg name="publish_map_tf" value="$(arg publish_map_tf)"/>
+      <arg name="publish_urdf" value="$(arg publish_urdf)"/>
+      <arg name="pose_frame" value="$(arg pose_frame)"/>
+      <arg name="odometry_frame" value="$(arg odometry_frame)"/>
+      <arg name="camera_flip" value="$(arg camera_flip)"/>
+    </include>
+  </group>
+</launch>

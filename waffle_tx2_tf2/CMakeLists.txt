@@ -36,6 +36,3 @@ target_link_libraries(tf2_scan_node ${catkin_LIBRARIES})
 
 add_executable(tf2_zed_node src/tf2_zed_node.cpp)
 target_link_libraries(tf2_zed_node ${catkin_LIBRARIES})
-
-add_executable(tf2_zed_optical_node src/tf2_zed_optical_node.cpp)
-target_link_libraries(tf2_zed_optical_node ${catkin_LIBRARIES})

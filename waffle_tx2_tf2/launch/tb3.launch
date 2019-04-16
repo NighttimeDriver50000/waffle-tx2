@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<launch>
+  <arg name="lidar_frame" default="scan"/>
+  <group ns="tb3">
+    <include file="$(find turtlebot3_bringup)/launch/turtlebot3_robot.launch">
+      <arg name="set_lidar_frame_id" value="$(arg lidar_frame)"/>
+    </include>
+  </group>
+</launch>
