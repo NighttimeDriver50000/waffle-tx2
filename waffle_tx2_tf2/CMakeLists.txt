@@ -28,9 +28,6 @@ include_directories(
 add_executable(tf2_odom_node src/tf2_odom_node.cpp)
 target_link_libraries(tf2_odom_node ${catkin_LIBRARIES})
 
-add_executable(tf2_base_link_node src/tf2_base_link_node.cpp)
-target_link_libraries(tf2_base_link_node ${catkin_LIBRARIES})
-
 add_executable(tf2_imu_node src/tf2_imu_node.cpp)
 target_link_libraries(tf2_imu_node ${catkin_LIBRARIES})
 
