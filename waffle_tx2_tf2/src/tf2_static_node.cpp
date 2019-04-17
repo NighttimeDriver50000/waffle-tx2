@@ -29,7 +29,7 @@ int main(int argc, char** argv)
   transform.transform.translation.y = y;
   transform.transform.translation.z = z;
   tf2::Quaternion q;
-  q.setRPY(roll, pitch, yaw);
+  q.setRPY(roll * M_PI, pitch * M_PI, yaw * M_PI);
   transform.transform.rotation.x = q.x();
   transform.transform.rotation.y = q.y();
   transform.transform.rotation.z = q.z();

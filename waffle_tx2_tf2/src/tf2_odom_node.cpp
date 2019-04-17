@@ -13,15 +13,16 @@ class OdomCaster
       tf2::Quaternion q;
       q.setRPY(0, 0, 0);
       current_ = tf2::Transform(q);
+      timer_ = node_.createTimer(ros::Duration(0.1),
+          &OdomCaster::castCurrent, this);
       sub_ = node_.subscribe("odom_corrections", 16,
           &OdomCaster::correctionCallback, this);
-      castCurrent(ros::Time::now());
     }
 
-    void castCurrent(const ros::Time& stamp)
+    void castCurrent(const ros::TimerEvent& event)
     {
       geometry_msgs::TransformStamped stamped;
-      stamped.header.stamp = stamp;
+      stamped.header.stamp = ros::Time::now();
       stamped.header.frame_id = "map";
       stamped.child_frame_id = "odom";
       stamped.transform = tf2::toMsg(current_);
@@ -33,13 +34,13 @@ class OdomCaster
       tf2::Transform offset;
       tf2::fromMsg(msg->transform, offset);
       current_ *= offset;
-      castCurrent(msg->header.stamp);
     }
   
   private:
     tf2_ros::TransformBroadcaster caster_;
     tf2::Transform current_;
     ros::NodeHandle node_;
+    ros::Timer timer_;
     ros::Subscriber sub_;
 };
 
