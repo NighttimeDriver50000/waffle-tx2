@@ -28,11 +28,5 @@ include_directories(
 add_executable(tf2_odom_node src/tf2_odom_node.cpp)
 target_link_libraries(tf2_odom_node ${catkin_LIBRARIES})
 
-add_executable(tf2_imu_node src/tf2_imu_node.cpp)
-target_link_libraries(tf2_imu_node ${catkin_LIBRARIES})
-
-add_executable(tf2_scan_node src/tf2_scan_node.cpp)
-target_link_libraries(tf2_scan_node ${catkin_LIBRARIES})
-
-add_executable(tf2_zed_node src/tf2_zed_node.cpp)
-target_link_libraries(tf2_zed_node ${catkin_LIBRARIES})
+add_executable(tf2_static_node src/tf2_static_node.cpp)
+target_link_libraries(tf2_static_node ${catkin_LIBRARIES})

@@ -2,8 +2,11 @@
 <launch>
   <group ns="waffle_tx2">
     <node name="tf2_odom" pkg="waffle_tx2_tf2" type="tf2_odom_node"/>
-    <node name="tf2_imu" pkg="waffle_tx2_tf2" type="tf2_imu_node"/>
-    <node name="tf2_scan" pkg="waffle_tx2_tf2" type="tf2_scan_node"/>
-    <node name="tf2_zed" pkg="waffle_tx2_tf2" type="tf2_zed_node"/>
+    <node name="tf2_imu" pkg="waffle_tx2_tf2" type="tf2_static_node"
+      args="base_footprint imu_link 0 0 0 0 0 0"/>
+    <node name="tf2_scan" pkg="waffle_tx2_tf2" type="tf2_static_node"
+      args="base_footprint base_scan 0 0 0 0 0 0"/>
+    <node name="tf2_zed" pkg="waffle_tx2_tf2" type="tf2_static_node"
+      args="base_footprint zed_camera_center 0 0 0 0 0 0"/>
   </group>
 </launch>
