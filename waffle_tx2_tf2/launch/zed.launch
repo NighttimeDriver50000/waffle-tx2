@@ -13,7 +13,7 @@
        RESOLUTION_VGA    -> 672*376,   available framerates: 15, 30, 60, 100 fps. -->
 
   <arg name="publish_tf" default="false"/>
-  <arg name="publish_map_tf" default="false"/>
+  <arg name="publish_map_tf" default="true"/>
   <arg name="publish_urdf" default="true"/>
   <arg name="pose_frame" default="zed_map"/>
   <arg name="odometry_frame" default="zed_odom"/>

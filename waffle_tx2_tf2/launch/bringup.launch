@@ -1,6 +1,21 @@
 <?xml version="1.0"?>
 <launch>
-  <include file="$(find waffle_tx2_tf2)/launch/tb3.launch"/>
-  <include file="$(find waffle_tx2_tf2)/launch/zed.launch"/>
-  <include file="$(find waffle_tx2_tf2)/launch/tf2.launch"/>
+  <arg name="sim" default="0"/>
+  <arg unless="$(arg sim)" name="zed" default="1"/>
+  <arg if="$(arg sim)" name="zed" default="0"/>
+  <arg name="localize" default="1"/>
+  <arg unless="$(arg localize)" name="base_frame" default="base_footprint"/>
+  <arg if="$(arg localize)" name="base_frame" default="base_link"/>
+  <include file="$(find waffle_tx2_tf2)/launch/tb3.launch">
+    <arg name="sim" value="$(arg sim)"/>
+  </include>
+  <include if="$(arg zed)" file="$(find waffle_tx2_tf2)/launch/zed.launch"/>
+  <include if="$(arg localize)" file="$(find waffle_tx2_tf2)/launch/localize.launch"/>
+  <include file="$(find waffle_tx2_tf2)/launch/tf2_static.launch">
+    <arg name="base_frame" value="$(arg base_frame)"/>
+  </include>
+  <include file="$(find waffle_tx2_tf2)/launch/tf2_odom.launch">
+    <arg name="connect_zed_map" value="$(arg zed)"/>
+    <arg name="localize" value="$(arg localize)"/>
+  </include>
 </launch>

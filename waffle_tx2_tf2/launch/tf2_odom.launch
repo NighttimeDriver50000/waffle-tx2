@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<launch>
+  <arg name="connect_zed_map" default="1"/>
+  <arg name="localize" default="1"/>
+  <arg unless="$(arg localize)" name="default_odom_frame" default="odom"/>
+  <arg if="$(arg localize)" name="default_odom_frame" default="cloud_odom"/>
+  <group ns="waffle_tx2">
+    <node name="tf2_odom" pkg="waffle_tx2_tf2" type="tf2_odom_node"
+      args="$(arg default_odom_frame)"/>
+    <!-- TODO: map->odom when default is cloud_odom, and map->zed_map -->
+  </group>
+</launch>

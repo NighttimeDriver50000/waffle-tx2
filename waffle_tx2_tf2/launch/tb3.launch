@@ -1,9 +1,13 @@
 <?xml version="1.0"?>
 <launch>
+  <arg name="sim" default="0"/>
   <arg name="lidar_frame" default="scan"/>
   <group ns="tb3">
-    <include file="$(find turtlebot3_bringup)/launch/turtlebot3_robot.launch">
+    <include unless="$(arg sim)"
+      file="$(find turtlebot3_bringup)/launch/turtlebot3_robot.launch">
       <arg name="set_lidar_frame_id" value="$(arg lidar_frame)"/>
     </include>
+    <include if="$(arg sim)"
+      file="$(find turtlebot3_gazebo)/launch/turtlebot3_world.launch"/>
   </group>
 </launch>

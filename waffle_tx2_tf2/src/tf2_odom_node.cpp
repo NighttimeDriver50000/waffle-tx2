@@ -1,3 +1,4 @@
+#include <string>
 #include <ros/ros.h>
 #include <tf2/LinearMath/Transform.h>
 #include <tf2/LinearMath/Quaternion.h>
@@ -8,12 +9,13 @@
 class OdomCaster
 {
   public:
-    OdomCaster()
+    OdomCaster(const std::string& odom_frame)
     {
       tf2::Quaternion q;
       q.setRPY(0, 0, 0);
       current_ = tf2::Transform(q);
-      timer_ = node_.createTimer(ros::Duration(0.1),
+      odom_frame_ = odom_frame;
+      timer_ = node_.createTimer(ros::Duration(0.02),
           &OdomCaster::castCurrent, this);
       sub_ = node_.subscribe("odom_corrections", 16,
           &OdomCaster::correctionCallback, this);
@@ -24,7 +26,7 @@ class OdomCaster
       geometry_msgs::TransformStamped stamped;
       stamped.header.stamp = ros::Time::now();
       stamped.header.frame_id = "map";
-      stamped.child_frame_id = "odom";
+      stamped.child_frame_id = odom_frame_;
       stamped.transform = tf2::toMsg(current_);
       caster_.sendTransform(stamped);
     }
@@ -40,6 +42,7 @@ class OdomCaster
     tf2_ros::TransformBroadcaster caster_;
     tf2::Transform current_;
     ros::NodeHandle node_;
+    std::string odom_frame_;
     ros::Timer timer_;
     ros::Subscriber sub_;
 };
@@ -47,7 +50,11 @@ class OdomCaster
 int main(int argc, char** argv)
 {
   ros::init(argc, argv, "tf2_odom_node");
-  OdomCaster caster;
+  if (argc != 2) {
+    std::cerr << "Usage: " << argv[0] << "odom_frame\n";
+    return 2;
+  }
+  OdomCaster caster(argv[1]);
   ros::spin();
   return 0;
 }
