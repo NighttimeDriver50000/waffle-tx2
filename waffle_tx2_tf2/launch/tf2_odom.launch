@@ -2,11 +2,16 @@
 <launch>
   <arg name="connect_zed_map" default="1"/>
   <arg name="localize" default="1"/>
-  <arg unless="$(arg localize)" name="default_odom_frame" default="odom"/>
-  <arg if="$(arg localize)" name="default_odom_frame" default="imu_odom"/>
+  <arg name="gazebo_prefix" default="odom"/>
+  <arg name="tb3_odom_frame" default="$(arg gazebo_prefix)odom"/>
+  <arg unless="$(arg localize)"
+    name="default_odom_frame" default="$(arg tb3_odom_frame)"/>
+  <arg if="$(arg localize)"
+    name="default_odom_frame" default="imu_odom"/>
   <group ns="waffle_tx2">
     <node name="tf2_odom" pkg="waffle_tx2_tf2" type="tf2_odom_node"
       args="$(arg default_odom_frame)"/>
-    <!-- TODO: map->odom when default is imu_odom, and map->zed_map -->
+    <!-- TODO: map->zed_map when connect_zed_map -->
+    <!-- TODO: map->$(arg tb3_odom_frame) when localizing -->
   </group>
 </launch>
