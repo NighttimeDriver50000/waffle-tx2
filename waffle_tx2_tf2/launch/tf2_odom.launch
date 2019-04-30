@@ -15,7 +15,7 @@
       pkg="waffle_tx2_tf2" type="tf2_sync_odom_node"
       args="map /tb3/odometry/filtered $(tb3_odom_frame) /tb3/odom"/>
     <node if="$(arg connect_zed_map)" name="tf2_zed_sync"
-      pkg="wafflte_tx2_tf2" type="tf2_sync_odom_node"
+      pkg="waffle_tx2_tf2" type="tf2_sync_odom_node"
       args="map /tb3/odom zed_map /zed/zed_node/odom 0.05 0 0.09 1 0 0"/>
   </group>
 </launch>

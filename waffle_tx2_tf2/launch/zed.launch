@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <launch>
-  <arg name="camera_model" default="0"/><!-- 0=ZED, 1=ZEDM -->
+  <arg name="camera_model" default="zed"/><!-- zed or zedm -->
   <arg name="verbose" default="false"/>
 
   <arg name="resolution" default="2"/>
@@ -14,23 +14,45 @@
 
   <arg name="publish_tf" default="false"/>
   <arg name="publish_map_tf" default="true"/>
-  <arg name="publish_urdf" default="true"/>
-  <arg name="pose_frame" default="zed_map"/>
+  <arg name="map_frame" default="zed_map"/>
   <arg name="odometry_frame" default="zed_odom"/>
   <arg name="camera_flip" default="true"/>
 
+  <arg name="publish_urdf" default="true"/>
+  
+  <arg name="node_name" default="zed_node"/>
+  <arg name="svo_file" default=""/>
+  <arg name="stream" default=""/>
+  <arg name="camera_id" default="-1"/>
+  <arg name="gpu_id" default="-1"/>
+
   <group ns="zed">
-    <include file="$(find zed_wrapper)/launch/zed_camera.launch">
-      <arg name="camera_model" value="$(arg camera_model)"/>
-      <arg name="verbose" value="$(arg verbose)"/>
-      <arg name="resolution" value="$(arg resolution)"/>
-      <arg name="frame_rate" value="$(arg frame_rate)"/>
-      <arg name="publish_tf" value="$(arg publish_tf)"/>
-      <arg name="publish_map_tf" value="$(arg publish_map_tf)"/>
-      <arg name="publish_urdf" value="$(arg publish_urdf)"/>
-      <arg name="pose_frame" value="$(arg pose_frame)"/>
-      <arg name="odometry_frame" value="$(arg odometry_frame)"/>
-      <arg name="camera_flip" value="$(arg camera_flip)"/>
-    </include>
+    <group if="$(arg publish_urdf)">
+      <param name="zed_description" textfile="$(find zed_wrapper)/urdf/$(arg camera_model).urdf" />
+      <node name="zed_state_publisher" pkg="robot_state_publisher" type="state_publisher">
+        <remap from="robot_description" to="zed_description" />
+      </node>
+    </group>
+    
+    <node name="$(arg node_name)" pkg="zed_wrapper" type="zed_wrapper_node"
+      output="screen" required="true"><!-- launch-prefix="valgrind" -->
+      <rosparam file="$(find zed_wrapper)/params/common.yaml" command="load"/>
+      <rosparam file="$(find zed_wrapper)/params/$(arg camera_model).yaml" command="load"/>
+
+      <param name="general/camera_model" value="$(arg camera_model)"/>
+      <param name="general/verbose" value="$(arg verbose)"/>
+      <param name="general/resolution" value="$(arg resolution)"/>
+      <param name="general/frame_rate" value="$(arg frame_rate)"/>
+      <param name="tracking/publish_tf" value="$(arg publish_tf)"/>
+      <param name="tracking/publish_map_tf" value="$(arg publish_map_tf)"/>
+      <param name="tracking/map_frame" value="$(arg map_frame)"/>
+      <param name="tracking/odometry_frame" value="$(arg odometry_frame)"/>
+      <param name="general/camera_flip" value="$(arg camera_flip)"/>
+
+      <param name="svo_file" value="$(arg svo_file)"/>
+      <param name="stream" value="$(arg stream)"/>
+      <param name="general/zed_id" value="$(arg camera_id)"/>
+      <param name="general/gpu_id" value="$(arg gpu_id)"/>
+    </node>
   </group>
 </launch>
