@@ -27,7 +27,6 @@
 
   <include file="$(find waffle_tx2_tf2)/launch/tf2_static.launch">
     <arg name="base_frame" value="$(arg base_frame)"/>
-    <arg name="gazebo_prefix" value="$(arg gazebo_prefix)"/>
   </include>
 
   <include file="$(find waffle_tx2_tf2)/launch/tf2_odom.launch">

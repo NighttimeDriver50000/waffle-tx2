@@ -1,11 +1,9 @@
 <?xml version="1.0"?>
 <launch>
   <arg name="base_frame" default="base_link"/>
-  <arg name="gazebo_prefix" default=""/>
-  <arg name="footprint_frame" default="$(arg gazebo_prefix)base_footprint"/>
   <group ns="waffle_tx2">
     <node name="tf2_imu" pkg="waffle_tx2_tf2" type="tf2_static_node"
-      args="$(arg footprint_frame) imu_link -0.16 -0.09 -0.01 0 0 0"/>
+      args="$(arg base_frame) imu_link -0.16 -0.09 -0.01 0 0 0"/>
     <node name="tf2_scan" pkg="waffle_tx2_tf2" type="tf2_static_node"
       args="$(arg base_frame) scan -0.06 0 0.13 0 0 0"/>
     <node name="tf2_zed" pkg="waffle_tx2_tf2" type="tf2_static_node"

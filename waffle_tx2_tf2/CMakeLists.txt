@@ -8,6 +8,7 @@ find_package(catkin REQUIRED COMPONENTS
   tf2_ros
   tf2_geometry_msgs
   geometry_msgs
+  nav_msgs
   sensor_msgs
 )
 catkin_package(
@@ -17,11 +18,18 @@ catkin_package(
   tf2_ros
   tf2_geometry_msgs
   geometry_msgs
+  nav_msgs
   sensor_msgs
 )
 include_directories(
   ${catkin_INCLUDE_DIRS}
 )
+
+add_executable(init_localization_tf2_node src/init_localization_tf2_node.cpp)
+target_link_libraries(init_localization_tf2_node ${catkin_LIBRARIES})
+
+add_executable(republish_imu_node src/republish_imu_node.cpp)
+target_link_libraries(republish_imu_node ${catkin_LIBRARIES})
 
 add_executable(tf2_odom_node src/tf2_odom_node.cpp)
 target_link_libraries(tf2_odom_node ${catkin_LIBRARIES})

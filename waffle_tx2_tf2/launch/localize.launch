@@ -1,6 +1,8 @@
 <?xml version="1.0"?>
 <launch>
   <group ns="waffle_tx2">
+    <node name="imu_odom_init" pkg="waffle_tx2_tf2" type="init_localization_tf2_node"
+      args="imu_odom base_link 0 0 0 0 0 0 30 /waffle_tx2/odometry/filtered"/>
     <node name="imu_odom_ekf" pkg="robot_localization" type="ekf_localization_node">
       <param name="frequency" value="30"/>
       <param name="sensor_timeout" value="0.1"/>
@@ -18,7 +20,7 @@
       </rosparam>
       <param name="odom0_queue_size" value="4"/>
       <param name="odom0_relative" value="true"/>
-      <param name="imu0" value="/tb3/imu"/>
+      <param name="imu0" value="/tb3/imu_link"/>
       <rosparam param="imu0_config">
         [false, false, false,
          true , true , true ,
@@ -32,6 +34,8 @@
       <param name="publish_tf" value="true"/>
       <param name="publish_acceleration" value="true"/>
       <param name="print_diagnostics" value="true"/>
+      <param name="debug" value="true"/>
+      <param name="debug_out_file" value="localize.out"/>
     </node>
   </group>
 </launch>

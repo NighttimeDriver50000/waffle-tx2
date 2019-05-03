@@ -1,12 +1,13 @@
 digraph G {
 "base_link" -> "zed_camera_center"[label=" Broadcaster: /waffle_tx2/tf2_zed\nAverage rate: 10000.0\nBuffer length: 0.0\nMost recent transform: 0.0\nOldest transform: 0.0\n"];
-"tb3/odom" -> "tb3/base_footprint"[label=" Broadcaster: /gazebo\nAverage rate: 30.205\nBuffer length: 4.966\nMost recent transform: 19.1\nOldest transform: 14.134\n"];
+"map" -> "imu_odom"[label=" Broadcaster: /waffle_tx2/tf2_odom\nAverage rate: 50.202\nBuffer length: 4.94\nMost recent transform: 69.841\nOldest transform: 64.901\n"];
+"tb3/odom" -> "tb3/base_footprint"[label=" Broadcaster: /gazebo\nAverage rate: 30.199\nBuffer length: 4.934\nMost recent transform: 69.846\nOldest transform: 64.912\n"];
 "base_link" -> "scan"[label=" Broadcaster: /waffle_tx2/tf2_scan\nAverage rate: 10000.0\nBuffer length: 0.0\nMost recent transform: 0.0\nOldest transform: 0.0\n"];
-"tb3/base_footprint" -> "imu_link"[label=" Broadcaster: /waffle_tx2/tf2_imu\nAverage rate: 10000.0\nBuffer length: 0.0\nMost recent transform: 0.0\nOldest transform: 0.0\n"];
-"map" -> "imu_odom"[label=" Broadcaster: /waffle_tx2/tf2_odom\nAverage rate: 50.202\nBuffer length: 4.96\nMost recent transform: 19.091\nOldest transform: 14.131\n"];
-"map" -> "tb3/odom"[label=" Broadcaster: /waffle_tx2/tf2_odom_sync\nAverage rate: 25.766\nBuffer length: 4.929\nMost recent transform: 19.065\nOldest transform: 14.136\n"];
+"base_link" -> "imu_link"[label=" Broadcaster: /waffle_tx2/tf2_imu\nAverage rate: 10000.0\nBuffer length: 0.0\nMost recent transform: 0.0\nOldest transform: 0.0\n"];
+"imu_odom" -> "base_link"[label=" Broadcaster: /waffle_tx2/imu_odom_ekf\nAverage rate: 30.193\nBuffer length: 4.935\nMost recent transform: 69.811\nOldest transform: 64.876\n"];
+"map" -> "tb3/odom"[label=" Broadcaster: /waffle_tx2/tf2_odom_sync\nAverage rate: 26.043\nBuffer length: 4.915\nMost recent transform: 69.839\nOldest transform: 64.924\n"];
 edge [style=invis];
  subgraph cluster_legend { style=bold; color=black; label ="view_frames Result";
-"Recorded at time: 19.122"[ shape=plaintext ] ;
+"Recorded at time: 69.86"[ shape=plaintext ] ;
 }->"map";
 }
