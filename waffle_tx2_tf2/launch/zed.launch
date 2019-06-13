@@ -54,5 +54,20 @@
       <param name="general/zed_id" value="$(arg camera_id)"/>
       <param name="general/gpu_id" value="$(arg gpu_id)"/>
     </node>
+
+    <group ns="zed_node/point_cloud">
+      <node name="zed_points_to_scan" pkg="pointcloud_to_laserscan"
+        type="pointcloud_to_laserscan_node">
+        <remap from="cloud_in" to="cloud_registered" />
+        <param name="min_height" value="0.0" />
+        <param name="max_height" value="1.0" />
+        <param name="angle_min" value="-0.7853981633974483" /><!-- -pi/4 -->
+        <param name="angle_max" value="0.7853981633974483" /><!-- pi/4 -->
+        <param name="angle_increment" value="0.008726646259971648" /><!-- (pi/2)/(720/4) -->
+        <param name="scan_time" value="0.03333333333333333" /><!-- 1/30 -->
+        <param name="range_min" value="1.0" />
+        <param name="range_max" value="15.0" />
+      </node>
+    </group>
   </group>
 </launch>
