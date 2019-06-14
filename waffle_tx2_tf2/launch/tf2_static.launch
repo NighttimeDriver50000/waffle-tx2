@@ -9,7 +9,7 @@
     <node name="tf2_scan" pkg="waffle_tx2_tf2" type="tf2_static_node"
       args="$(arg base_frame) scan -0.06 0 0.13 0 0 0"/>
     <node name="tf2_zed" pkg="waffle_tx2_tf2" type="tf2_static_node"
-      args="$(arg base_frame) zed_camera_center 0.05 0 0.09 1 0 0"/>
+      args="$(arg base_frame) zed_camera_center 0.05 0 0.09 0 0 0"/>
     <node unless="$(arg localize)"
       name="tf2_base_link" pkg="waffle_tx2_tf2" type="tf2_static_node"
       args="$(arg base_frame) base_link 0 0 0 0 0 0"/>
