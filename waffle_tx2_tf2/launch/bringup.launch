@@ -8,7 +8,7 @@
   <arg unless="$(arg sim)" name="zed" default="1"/>
   <arg if="$(arg sim)" name="zed" default="0"/>
 
-  <arg name="localize" default="1"/>
+  <arg name="localize" default="0"/>
   <arg unless="$(arg localize)" name="base_frame" default="base_footprint"/>
   <arg if="$(arg localize)" name="base_frame" default="base_link"/>
 
