@@ -9,8 +9,6 @@
   <arg if="$(arg sim)" name="zed" default="0"/>
 
   <arg name="localize" default="0"/>
-  <arg unless="$(arg localize)" name="base_frame" default="base_footprint"/>
-  <arg if="$(arg localize)" name="base_frame" default="base_link"/>
 
   <include if="$(arg teleop)"
     file="$(find waffle_tx2_tf2)/launch/tb3_teleop.launch"/>
@@ -26,7 +24,7 @@
     file="$(find waffle_tx2_tf2)/launch/localize.launch"/>
 
   <include file="$(find waffle_tx2_tf2)/launch/tf2_static.launch">
-    <arg name="base_frame" value="$(arg base_frame)"/>
+    <arg name="localize" value="$(arg localize)"/>
   </include>
 
   <include file="$(find waffle_tx2_tf2)/launch/tf2_odom.launch">
