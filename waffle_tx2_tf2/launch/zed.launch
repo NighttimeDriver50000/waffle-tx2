@@ -14,6 +14,7 @@
 
   <arg name="publish_tf" default="false"/>
   <arg name="publish_map_tf" default="true"/>
+  <arg name="base_frame" default="base_footprint"/>
   <arg name="map_frame" default="zed_map"/>
   <arg name="odometry_frame" default="zed_odom"/>
   <arg name="camera_flip" default="true"/>
