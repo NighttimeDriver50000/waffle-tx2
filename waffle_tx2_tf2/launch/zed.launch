@@ -46,6 +46,7 @@
       <param name="general/frame_rate" value="$(arg frame_rate)"/>
       <param name="tracking/publish_tf" value="$(arg publish_tf)"/>
       <param name="tracking/publish_map_tf" value="$(arg publish_map_tf)"/>
+      <param name="general/base_frame" value="$(arg base_frame)"/>
       <param name="tracking/map_frame" value="$(arg map_frame)"/>
       <param name="tracking/odometry_frame" value="$(arg odometry_frame)"/>
       <param name="general/camera_flip" value="$(arg camera_flip)"/>
