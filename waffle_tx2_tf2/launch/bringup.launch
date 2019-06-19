@@ -10,6 +10,9 @@
 
   <arg name="localize" default="0"/>
 
+  <arg name="cartographer" default="1"/>
+  <arg name="offline" default="0"/>
+
   <include if="$(arg teleop)"
     file="$(find waffle_tx2_tf2)/launch/tb3_teleop.launch"/>
 
@@ -28,8 +31,17 @@
   </include>
 
   <include file="$(find waffle_tx2_tf2)/launch/tf2_odom.launch">
+    <arg name="cartographer" value="$(arg cartographer)"/>
     <arg name="localize" value="$(arg localize)"/>
     <arg name="gazebo_prefix" value="$(arg gazebo_prefix)"/>
+  </include>
+
+  <include unless="$(arg offline)"
+    file="$(find waffle_tx2_tf2)/launch/cartographer.launch">
+    <arg name="cartographer" value="$(arg cartographer)"/>
     <arg name="connect_zed_map" value="$(arg zed)"/>
   </include>
+  <node if="$(arg offline)" name="record_scans" pkg="rosbag" type="record"
+    args="record -o /tmp/waffle-tx2-scans /tb3/imu_linked /tb3/odom /tb3/scan
+    /tf /tf_static /zed/zed_node/point_cloud/scan"/>
 </launch>
