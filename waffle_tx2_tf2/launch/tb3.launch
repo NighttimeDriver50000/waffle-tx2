@@ -4,6 +4,10 @@
   <arg name="lidar_frame" default="scan"/>
   <group ns="tb3">
     <node name="republish_imu" pkg="waffle_tx2_tf2" type="republish_imu_node"/>
+    <node name="center_imu" pkg="imu_transformer" type="imu_transformer_node">
+      <remap from="imu_in/data" to="/tb3/imu_linked"/>
+      <param name="target_frame" value="base_footprint"/>
+    </node>
     <include unless="$(arg sim)"
       file="$(find turtlebot3_bringup)/launch/turtlebot3_robot.launch">
       <arg name="set_lidar_frame_id" value="$(arg lidar_frame)"/>

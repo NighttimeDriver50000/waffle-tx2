@@ -11,7 +11,7 @@
       -configuration_basename cartographer.lua">
       <remap from="scan_1" to="/tb3/scan"/>
       <remap from="scan_2" to="/zed/zed_node/point_cloud/scan"/>
-      <remap from="imu" to="/tb3/imu_linked"/>
+      <remap from="imu" to="/tb3/imu_out/data"/>
       <remap from="odom" to="/tb3/odom"/>
     </node>
     <node if="$(arg offline)" name="cartographer"
@@ -21,7 +21,7 @@
       -bag_filenames $(arg bag_filenames)">
       <remap from="scan_1" to="/tb3/scan"/>
       <remap from="scan_2" to="/zed/zed_node/point_cloud/scan"/>
-      <remap from="imu" to="/tb3/imu_linked"/>
+      <remap from="imu" to="/tb3/imu_out/data"/>
       <remap from="odom" to="/tb3/odom"/>
     </node>
     <node name="occupancy" pkg="cartographer_ros"
