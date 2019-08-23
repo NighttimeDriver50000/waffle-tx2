@@ -1,0 +1,35 @@
+<?xml version="1.0"?>
+<launch>
+  <!-- Launch ZED Wrapper Node -->
+  <include file="$(find zed_wrapper)/launch/zed.launch"/>
+
+  <!-- GENERAL ZED PARAMETERS -->
+  <!-- true, false -->
+  <param name="/zed/zed_node/general/camera_flip" value="true"/>
+
+  <!-- 0=HD2K, 1=HD1080, 2=HD720, 3=VGA -->
+  <param name="/zed/zed_node/general/resolution" value="1"/>
+
+  <!-- HD2K   -> 2208*1242, framerates: 13 fps.
+       HD1080 -> 1920*1080, framerates: 15, 30 fps.
+       HD720  -> 1280*720,  framerates: 15, 30, 60 fps.
+       VGA    -> 672*376,   framerates: 15, 30, 60, 100 fps. -->
+  <param name="/zed/zed_node/general/frame_rate" value="30"/>
+
+
+  <!-- DEPTH ZED PARAMETERS -->
+  <!-- 0=NONE, 1=PERFORMANCE, 2=MEDIUM, 3=QUALITY, 4=ULTRA -->
+  <param name="/zed/zed_node/depth/quality" value="1"/>
+
+  <!-- MAPPING ZED PARAMETERS -->
+  <!-- true, false -->
+  <param name="/zed/zed_node/mapping/mapping_enabled" value="true"/>
+
+  <!-- 0: HIGH, 1: MEDIUM, 2: LOW -->
+  <param name="/zed/zed_node/mapping/resolution" value="1"/>
+  
+  <!-- Launch Navigation Node -->
+  <group ns="waffle_tx2">
+    <node name="navigation" pkg="waffle_tx2_navigation" type="navigation_node" output="screen"/>
+  </group>
+</launch>
