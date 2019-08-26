@@ -6,11 +6,11 @@ namespace TurtleBot3Navigation
   {
     hasNoObsticleCloud = false;
     assert (msg != 0);
-    ROS_INFO("Processing Cloud Message!");
+    //ROS_INFO("Processing Cloud Message!");
 
     //Update the point cloud used for planning
     obstacleCloud = msg;
-    ROS_INFO("DOES ASSIGNMENT WORK?");
+    //ROS_INFO("DOES ASSIGNMENT WORK?");
   }
   
   void createBoundingboxAndPub(ros::Publisher& pub, float minimumViewPoint, float maximumViewPoint, 
@@ -19,7 +19,7 @@ namespace TurtleBot3Navigation
     nav_msgs::Path path; 
     geometry_msgs::PoseStamped pose;
     path.header.stamp = ros::Time::now();
-    path.header.frame_id = "map";
+    path.header.frame_id = "base_link";
       
     std::vector<float> extremes(6,0);
 
@@ -32,7 +32,7 @@ namespace TurtleBot3Navigation
 
     //Close Left Bottom
     pose.header.stamp = ros::Time::now();
-    pose.header.frame_id = "map";
+    pose.header.frame_id = "base_link";
     pose.pose.position.x = extremes[0];
     pose.pose.position.y = extremes[2];
     pose.pose.position.z = -extremes[4];
@@ -40,7 +40,7 @@ namespace TurtleBot3Navigation
     
     //Far Left Bottom
     pose.header.stamp = ros::Time::now();
-    pose.header.frame_id = "map";
+    pose.header.frame_id = "base_link";
     pose.pose.position.x = extremes[1];
     pose.pose.position.y = extremes[3];
     pose.pose.position.z = -extremes[5];
@@ -48,7 +48,7 @@ namespace TurtleBot3Navigation
 
     //Far Right Bottom
     pose.header.stamp = ros::Time::now();
-    pose.header.frame_id = "map";
+    pose.header.frame_id = "base_link";
     pose.pose.position.x = extremes[1];
     pose.pose.position.y = -extremes[3];
     pose.pose.position.z = -extremes[5];
@@ -56,7 +56,7 @@ namespace TurtleBot3Navigation
     
     //Close Right Bottom
     pose.header.stamp = ros::Time::now();
-    pose.header.frame_id = "map";
+    pose.header.frame_id = "base_link";
     pose.pose.position.x = extremes[0];
     pose.pose.position.y = -extremes[2];
     pose.pose.position.z = -extremes[4];
@@ -64,7 +64,7 @@ namespace TurtleBot3Navigation
   
     //Close Left Bottom
     pose.header.stamp = ros::Time::now();
-    pose.header.frame_id = "map";
+    pose.header.frame_id = "base_base";
     pose.pose.position.x = extremes[0];
     pose.pose.position.y = extremes[2];
     pose.pose.position.z = -extremes[4];
@@ -72,7 +72,7 @@ namespace TurtleBot3Navigation
 
     //Close Left Top
     pose.header.stamp = ros::Time::now();
-    pose.header.frame_id = "map";
+    pose.header.frame_id = "base_link";
     pose.pose.position.x = extremes[0];
     pose.pose.position.y = extremes[2];
     pose.pose.position.z = extremes[4];
@@ -80,7 +80,7 @@ namespace TurtleBot3Navigation
 
     //Far Left Top
     pose.header.stamp = ros::Time::now();
-    pose.header.frame_id = "map";
+    pose.header.frame_id = "base_link";
     pose.pose.position.x = extremes[1];
     pose.pose.position.y = extremes[3];
     pose.pose.position.z = extremes[5];
@@ -88,7 +88,7 @@ namespace TurtleBot3Navigation
     
     //Far Left Bottom
     pose.header.stamp = ros::Time::now();
-    pose.header.frame_id = "map";
+    pose.header.frame_id = "base_link";
     pose.pose.position.x = extremes[1];
     pose.pose.position.y = extremes[3];
     pose.pose.position.z = -extremes[5];
@@ -96,7 +96,7 @@ namespace TurtleBot3Navigation
     
     //Far Left Top
     pose.header.stamp = ros::Time::now();
-    pose.header.frame_id = "map";
+    pose.header.frame_id = "base_link";
     pose.pose.position.x = extremes[1];
     pose.pose.position.y = extremes[3];
     pose.pose.position.z = extremes[5];
@@ -104,7 +104,7 @@ namespace TurtleBot3Navigation
 
     //Far Right Top
     pose.header.stamp = ros::Time::now();
-    pose.header.frame_id = "map";
+    pose.header.frame_id = "base_link";
     pose.pose.position.x = extremes[1];
     pose.pose.position.y = -extremes[3];
     pose.pose.position.z = extremes[5];
@@ -112,7 +112,7 @@ namespace TurtleBot3Navigation
     
     //Far Right Bottom
     pose.header.stamp = ros::Time::now();
-    pose.header.frame_id = "map";
+    pose.header.frame_id = "base_link";
     pose.pose.position.x = extremes[1];
     pose.pose.position.y = -extremes[3];
     pose.pose.position.z = -extremes[5];
@@ -120,7 +120,7 @@ namespace TurtleBot3Navigation
     
     //Far Right Top
     pose.header.stamp = ros::Time::now();
-    pose.header.frame_id = "map";
+    pose.header.frame_id = "base_link";
     pose.pose.position.x = extremes[1];
     pose.pose.position.y = -extremes[3];
     pose.pose.position.z = extremes[5];
@@ -128,7 +128,7 @@ namespace TurtleBot3Navigation
 
     //Close Right Top
     pose.header.stamp = ros::Time::now();
-    pose.header.frame_id = "map";
+    pose.header.frame_id = "base_link";
     pose.pose.position.x = extremes[0];
     pose.pose.position.y = -extremes[2];
     pose.pose.position.z = extremes[4];
@@ -136,7 +136,7 @@ namespace TurtleBot3Navigation
     
     //Close Right Bottom
     pose.header.stamp = ros::Time::now();
-    pose.header.frame_id = "map";
+    pose.header.frame_id = "base_link";
     pose.pose.position.x = extremes[0];
     pose.pose.position.y = -extremes[2];
     pose.pose.position.z = -extremes[4];
@@ -144,7 +144,7 @@ namespace TurtleBot3Navigation
     
     //Close Right Top
     pose.header.stamp = ros::Time::now();
-    pose.header.frame_id = "map";
+    pose.header.frame_id = "base_link";
     pose.pose.position.x = extremes[0];
     pose.pose.position.y = -extremes[2];
     pose.pose.position.z = extremes[4];
@@ -152,7 +152,7 @@ namespace TurtleBot3Navigation
     
     //Close Left Top
     pose.header.stamp = ros::Time::now();
-    pose.header.frame_id = "map";
+    pose.header.frame_id = "base_link";
     pose.pose.position.x = extremes[0];
     pose.pose.position.y = extremes[2];
     pose.pose.position.z = extremes[4];
@@ -166,12 +166,12 @@ namespace TurtleBot3Navigation
   {
     nav_msgs::Path path; 
     path.header.stamp = ros::Time::now();
-    path.header.frame_id = "map";
+    path.header.frame_id = "base_link";
     for(int i = 0; i < 15; i++)
     {
       geometry_msgs::PoseStamped pose; 
       pose.header.stamp = ros::Time::now();
-      pose.header.frame_id = "map";
+      pose.header.frame_id = "base_link";
       pose.pose.position.x = i;
       pose.pose.position.y = 0;
       pose.pose.position.z = 0;
@@ -184,11 +184,11 @@ namespace TurtleBot3Navigation
   {
     sensor_msgs::PointCloud2Ptr cloud;
     cloud.reset(new sensor_msgs::PointCloud2);
-    cloud->header.frame_id = "map";
+    cloud->header.frame_id = "base_link";
     cloud->is_bigendian = false;
     cloud->is_dense = false;
-    cloud->width = 1;
-    cloud->height = 10;
+    cloud->width = NUMBER_OF_RRT_NODES;
+    cloud->height = 1;
     
     sensor_msgs::PointCloud2Modifier modifier(*cloud);
     modifier.setPointCloud2Fields(4, "x", 1, sensor_msgs::PointField::FLOAT32, 
@@ -298,14 +298,17 @@ namespace TurtleBot3Navigation
     sensor_msgs::PointCloud2Iterator<float> iter_x(*cloud, "x"),
       iter_y(*cloud, "y"),
       iter_z(*cloud, "z");
-      for (size_t i = 0; i < (cloud->width)*(cloud->height); ++i) 
+    for (size_t i = 0; i < (cloud->width)*(cloud->height); ++i) 
+    {
+      float dist = calcDistBetweenPoints(cloud, i, point_x, point_y, point_z);
+      if(dist < minAllowedDistance)
       {
-        float dist = calcDistBetweenPoints(cloud, i, point_x, point_y, point_z);
-        if(dist < minAllowedDistance)
-          return false;
-        ++iter_x; ++iter_y; ++iter_z;
+        ROS_INFO("Collision Detected %f < %f", dist, minAllowedDistance);
+        return false;
       }
-      return true;
+      ++iter_x; ++iter_y; ++iter_z;
+    }
+    return true;
   }
   
   bool noCollision(sensor_msgs::PointCloud2Ptr cloud, float point_x1, float point_y1, float point_z1, float point_x2, float point_y2, float point_z2, float minAllowedDistance, float stepDistance)
@@ -351,15 +354,15 @@ namespace TurtleBot3Navigation
     cloud.reset(new sensor_msgs::PointCloud2);
     //ROS_INFO("New Point Cloud Initialised!");
     //Set the frame of the point cloud
-    cloud->header.frame_id = "map";
+    cloud->header.frame_id = "base_link";
     //Set 
     cloud->is_bigendian = false;
     //Set
     cloud->is_dense = false;
     //Since the cloud is unordered, the width is set to 1
-    cloud->width = 1;
+    cloud->width = NUMBER_OF_RRT_NODES;
     //Since the cloud is unordered, the height is set to the number of points
-    cloud->height = 10;
+    cloud->height = 1;
     //Create a modifier to edit the new point cloud
     sensor_msgs::PointCloud2Modifier modifier(*cloud);
     //ROS_INFO("Created Point Cloud Modifier!");
@@ -387,7 +390,7 @@ namespace TurtleBot3Navigation
     *iter_pi = 0;
     *iter_c = 0;
     //ROS_INFO("Created initial Point in point cloud!");
-    ROS_INFO("Point: (%f ,%f, %f) Parent Index: %f", *iter_x, *iter_y, *iter_z, *iter_pi);
+    //ROS_INFO("Point: (%f ,%f, %f) Parent Index: %f", *iter_x, *iter_y, *iter_z, *iter_pi);
     ++iter_x; ++iter_y; ++iter_z; ++iter_rgb; ++iter_pi; ++iter_c;
     //Keep track of the amount of RRT Nodes
     size_t numberOfNodes = 1;
@@ -398,8 +401,9 @@ namespace TurtleBot3Navigation
       it_z(*cloud, "z");
     //ROS_INFO("Created iterators for indexing!");
     //Generate the x coordinates
-    vector<float> x_points = generateRandomValues((cloud->width)*(cloud->height)-1, minimumViewPoint, maximumViewPoint);
+    vector<float> x_points = generateRandomValues(((cloud->width)*(cloud->height))-1, minimumViewPoint, maximumViewPoint);
     //ROS_INFO("Genorated x-axis coordinate points!");
+   size_t pointCount = 1;
     for (float& x : x_points)
     {
       float yExtreme = yAxisBoundarySlope*(x)+yAxisBoundaryIntercept; 
@@ -408,23 +412,23 @@ namespace TurtleBot3Navigation
       float z = generateRandomValue(-zExtreme, zExtreme);
       size_t index = findClosestPoint(cloud, numberOfNodes, x, y, z);      
       float dist = calcDistBetweenPoints(cloud, index, x, y, z);
-      ROS_INFO("Random Point: (%f ,%f, %f) Parent Index: %lu Distance: %f", x, y, z, (unsigned long) index, dist);
+      //ROS_INFO("Random Point: (%f ,%f, %f) Parent Index: %lu Distance: %f", x, y, z, (unsigned long) index, dist);
       
       float x_p = *(it_x + index);
       float y_p = *(it_y + index);
       float z_p = *(it_z + index);
-      ROS_INFO("Parent Point: (%f ,%f, %f)", x_p, y_p, z_p);
+      //ROS_INFO("Parent Point: (%f ,%f, %f)", x_p, y_p, z_p);
      
       float dx = (x - x_p)/dist;
       float dy = (y - y_p)/dist;
       float dz = (z - z_p)/dist;
-      ROS_INFO("Unit Vector: (%f ,%f, %f)", dx, dy, dz);
+      //ROS_INFO("Unit Vector: (%f ,%f, %f)", dx, dy, dz);
     
-      stringstream ss;
-      ss << "Obstacle Cloud " << obstacleCloud << endl; 
-      ROS_INFO("%s",ss.str().c_str());
+      //stringstream ss;
+      //ss << "Obstacle Cloud " << obstacleCloud << endl; 
+      //ROS_INFO("%s",ss.str().c_str());
       
-      if(noCollision(obstacleCloud, x_p + dx, y_p + dy, z_p + dz, COLLISION_DISTANCE))
+      if(noCollision(obstacleCloud, x_p, y_p, z_p, x_p + dx, y_p + dy, z_p + dz, COLLISION_DISTANCE, COLLISION_STEP_DISTANCE))
       {
       *iter_x = x_p + dx;
       *iter_y = y_p + dy;
@@ -432,9 +436,20 @@ namespace TurtleBot3Navigation
       *iter_pi = index;
       *iter_c = dist;
 
-      ROS_INFO("Point: (%f ,%f, %f) Parent Index: %lu", *iter_x, *iter_y, *iter_z, (unsigned long) *iter_pi);
+      ROS_INFO("Accepted Point (%lu of %lu): (%f ,%f, %f) Parent Index: %lu", pointCount, x_points.size(), *iter_x, *iter_y, *iter_z, (unsigned long) *iter_pi);
+      *iter_rgb = 0x00FF00;
+      ++iter_x; ++iter_y; ++iter_z; ++iter_rgb; ++iter_pi; ++iter_c; ++numberOfNodes; ++pointCount;
+      } else {
+      /*
+      *iter_x = x_p + dx;
+      *iter_y = y_p + dy;
+      *iter_z = z_p + dz;
+      *iter_pi = index;
+      *iter_c = dist;
+
+      ROS_INFO("Rejected Point (%lu of %lu): (%f ,%f, %f) Parent Index: %lu", pointCount, x_points.size(), *iter_x, *iter_y, *iter_z, (unsigned long) *iter_pi);
       *iter_rgb = 0xFF0000;
-      ++iter_x; ++iter_y; ++iter_z; ++iter_rgb; ++iter_pi; ++iter_c; ++numberOfNodes;
+      */
       }
     }
     return cloud;
@@ -448,8 +463,8 @@ int main(int argc, char** argv)
   ros::NodeHandle node;
   ros::Rate loop_rate(NAVIGATION_LOOPRATE);
 
-  ros::Publisher path_pub = node.advertise<nav_msgs::Path>("path",1);
-  ros::Publisher cloud_pub = node.advertise<sensor_msgs::PointCloud2>("cloud",1);
+  ros::Publisher path_pub = node.advertise<nav_msgs::Path>("camera_boundry",1);
+  ros::Publisher cloud_pub = node.advertise<sensor_msgs::PointCloud2>("cloud_rrt",1);
   ros::Subscriber pointCloud_sub = node.subscribe("/zed/zed_node/point_cloud/cloud_registered", 1, cloud_callback); 
   //Wait for obsticle cloud
   while(hasNoObsticleCloud)

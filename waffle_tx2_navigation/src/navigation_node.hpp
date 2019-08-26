@@ -37,7 +37,9 @@
 #define BOUND_BOX_Z_AXIS_SLOPE 0.4 
 #define BOUND_BOX_Z_AXIS_INTERCEPT 0 //meters
 
-#define COLLISION_DISTANCE 0.5 //meters
+#define NUMBER_OF_RRT_NODES 6
+#define COLLISION_DISTANCE 0.3 //meters
+#define COLLISION_STEP_DISTANCE 0.05 //meters
 using namespace std;
 
 namespace TurtleBot3Navigation
