@@ -271,11 +271,20 @@ namespace TurtleBot3Navigation
     return dist;
   }
   
+  float calcDistBetweenPointAndLine(float linePoint_x1, float linePoint_y1,
+      float linePoint_z1, float LinePoint_x2, float linePoint_y2, float linePoint_z2,
+      float point_x, float point_y, float linePoint_z)
+  {
+    return nan(""); 
+  }
+  
   size_t findClosestPoint(sensor_msgs::PointCloud2Ptr cloud, size_t nodesGenerated, float point_x, float point_y, float point_z)
   { 
     //set index to first point and minimum distance to the first point in the cloud
     size_t index = 0;
     float distMin = calcDistBetweenPoints(cloud, 0, point_x, point_y, point_z);
+    //Is Safe Iter
+    sensor_msgs::PointCloud2Iterator<float> iter_isSafe(*cloud, "isSafe");
     
     //walk through the point cloud checking for the minimum distance to the given point
     for(size_t i = 1; i < nodesGenerated; i++)
@@ -283,7 +292,7 @@ namespace TurtleBot3Navigation
       //use euclidean norm to find distance between the two points
       float dist = calcDistBetweenPoints(cloud, i, point_x, point_y, point_z);
       //Compare the current minimum to the newly measured distance
-      if(distMin > dist)
+      if(distMin > dist && iter_isSafe[i])
       {
         //if new minimum, index and save new minimum distance
         index = i;
@@ -293,7 +302,7 @@ namespace TurtleBot3Navigation
     return index;
   }
 
-  bool noCollision(sensor_msgs::PointCloud2Ptr cloud, float point_x, float point_y, float point_z, float minAllowedDistance)
+  bool noCollisionInSphere(sensor_msgs::PointCloud2Ptr cloud, float point_x, float point_y, float point_z, float minAllowedDistance)
   {
     sensor_msgs::PointCloud2Iterator<float> iter_x(*cloud, "x"),
       iter_y(*cloud, "y"),
@@ -303,46 +312,74 @@ namespace TurtleBot3Navigation
       float dist = calcDistBetweenPoints(cloud, i, point_x, point_y, point_z);
       if(dist < minAllowedDistance)
       {
-        ROS_INFO("Collision Detected %f < %f", dist, minAllowedDistance);
+        //ROS_INFO("Collision Detected %f < %f", dist, minAllowedDistance);
         return false;
       }
       ++iter_x; ++iter_y; ++iter_z;
     }
     return true;
   }
-  
-  bool noCollision(sensor_msgs::PointCloud2Ptr cloud, float point_x1, float point_y1, float point_z1, float point_x2, float point_y2, float point_z2, float minAllowedDistance, float stepDistance)
+  bool noCollisionInCylinder(sensor_msgs::PointCloud2Ptr cloud, float point_x1, float point_y1,
+      float point_z1, float point_x2, float point_y2, float point_z2, 
+      float minAllowedDistance)
   {
-    //Calculate the Total Distance
+
+    //Calculate the Total Distance between points
     float dist = calcDistBetweenPoints(point_x1, point_y1, point_z1, point_x2, point_y2, point_z2);
-    //Calculate the Unit Vector 
+
+    //Calculate the Unit Vector
     float dx = (point_x2 - point_x1)/dist;
     float dy = (point_y2 - point_y1)/dist;
     float dz = (point_z2 - point_z1)/dist;
-    //initial Point
-    float x = point_x1;
-    float y = point_y1;
-    float z = point_z1;
 
-    for(size_t i = 0; i < ceil(dist/stepDistance); i++)
+    //Create iterator to walk through Point Cloud
+    sensor_msgs::PointCloud2Iterator<float> iter_x(*cloud, "x"),
+      iter_y(*cloud, "y"),
+      iter_z(*cloud, "z");
+
+    //Walk Trough the Point Cloud
+    for (size_t i = 0; i < (cloud->width)*(cloud->height); ++i) 
     {
-      if(noCollision(cloud, x, y, z, minAllowedDistance))
+      //Calculate the Vector between the start and cloud point
+      float dx_sc = point_x1 - *iter_x;
+      float dy_sc = point_y1 - *iter_y;
+      float dz_sc = point_z1 - *iter_z;
+      
+      //Calculate the Vector between the goal and cloud point
+      float dx_gc = point_x2 - *iter_x;
+      float dy_gc = point_y2 - *iter_y;
+      float dz_gc = point_z2 - *iter_z;
+      
+      //Calculate the Dot product between the two vectors and check if negative
+      //This means the point is between the ends of the cylinder
+      if( dx_sc*dx_gc + dy_sc*dy_gc + dz_sc*dz_gc < 0)
       {
-        if( stepDistance > calcDistBetweenPoints(x, y, z, point_x2, point_y2, point_z2))
-        {
-          x = point_x2;
-          y = point_y2;
-          z = point_z2;
-        } else {
-          x += stepDistance*dx;
-          y += stepDistance*dy;
-          z += stepDistance*dz;
-        }
-      } else {
-        return false;
+        //Calculate the vector cross product with the unit vector
+        float dx_cp = dy_gc*dz - dz_gc*dy;
+        float dy_cp = dx_gc*dz - dz_gc*dx;
+        float dz_cp = dx_gc*dy - dy_gc*dx;
+
+        //Calculate the area of the Parallelogram formed with the unit vector (Base) and calculated vector (Side)
+        //as the magnatude of the cross product of these vectors
+        float area = sqrt(dx_cp*dx_cp + dy_cp*dy_cp + dz_cp*dz_cp);
+
+        //Divide the Area of the Parallelogram to get the height
+        //(unit vector distance is 1); height = area/1 = area
+        
+        //Check if the cloud point is inside cylinder, return false for collision.
+        if(area < minAllowedDistance)
+          return false;
       }
     }
-    return false;
+    return true;
+  }
+
+  bool noCollision(sensor_msgs::PointCloud2Ptr cloud, float point_x1, float point_y1,
+      float point_z1, float point_x2, float point_y2, float point_z2, 
+      float minAllowedDistance, float minAllowedStepDistance)
+  {
+    return noCollisionInCylinder(cloud, point_x1, point_y1, point_z1, point_x2, 
+        point_y2, point_z2, minAllowedDistance);
   }
 
   sensor_msgs::PointCloud2Ptr generateRandomInViewCloud(float minimumViewPoint, float maximumViewPoint, 
@@ -367,10 +404,11 @@ namespace TurtleBot3Navigation
     sensor_msgs::PointCloud2Modifier modifier(*cloud);
     //ROS_INFO("Created Point Cloud Modifier!");
     //Use the modifier to set the fields in the point cloud
-    modifier.setPointCloud2Fields(6, "x", 1, sensor_msgs::PointField::FLOAT32, 
+    modifier.setPointCloud2Fields(7, "x", 1, sensor_msgs::PointField::FLOAT32, 
         "y", 1, sensor_msgs::PointField::FLOAT32,
         "z", 1, sensor_msgs::PointField::FLOAT32,
         "rgb", 1, sensor_msgs::PointField::FLOAT32,
+        "isSafe", 1, sensor_msgs::PointField::INT8,
         "parentIndex", 1, sensor_msgs::PointField::UINT32,
         "cost", 1, sensor_msgs::PointField::FLOAT32);
     //ROS_INFO("Created Point Cloud Fields!");
@@ -379,19 +417,21 @@ namespace TurtleBot3Navigation
       iter_y(*cloud, "y"),
       iter_z(*cloud, "z"),
       iter_rgb(*cloud,"rgb"),
+      iter_isSafe(*cloud, "isSafe"),
       iter_pi(*cloud, "parentIndex"),
       iter_c(*cloud, "cost");
     //ROS_INFO("Created initial Point Cloud for generation!");
     //Set the first point as the current location of the robot
-    *iter_x = 0; 
+    *iter_x = 0;
     *iter_x = 0; 
     *iter_x = 0; 
     *iter_rgb = 0xFF0000;
+    *iter_isSafe = true;
     *iter_pi = 0;
     *iter_c = 0;
     //ROS_INFO("Created initial Point in point cloud!");
     //ROS_INFO("Point: (%f ,%f, %f) Parent Index: %f", *iter_x, *iter_y, *iter_z, *iter_pi);
-    ++iter_x; ++iter_y; ++iter_z; ++iter_rgb; ++iter_pi; ++iter_c;
+    
     //Keep track of the amount of RRT Nodes
     size_t numberOfNodes = 1;
 
@@ -403,9 +443,11 @@ namespace TurtleBot3Navigation
     //Generate the x coordinates
     vector<float> x_points = generateRandomValues(((cloud->width)*(cloud->height))-1, minimumViewPoint, maximumViewPoint);
     //ROS_INFO("Genorated x-axis coordinate points!");
-   size_t pointCount = 1;
+    size_t pointCount = 0;
     for (float& x : x_points)
     {
+      ++iter_x; ++iter_y; ++iter_z; ++iter_rgb; ++iter_pi; ++iter_c; ++numberOfNodes; ++pointCount;
+      //float x = generateRandomValue(minimumViewPoint, maximumVeiwPoint);
       float yExtreme = yAxisBoundarySlope*(x)+yAxisBoundaryIntercept; 
       float y = generateRandomValue(-yExtreme, yExtreme);
       float zExtreme = zAxisBoundarySlope*(x)+zAxisBoundaryIntercept; 
@@ -430,26 +472,25 @@ namespace TurtleBot3Navigation
       
       if(noCollision(obstacleCloud, x_p, y_p, z_p, x_p + dx, y_p + dy, z_p + dz, COLLISION_DISTANCE, COLLISION_STEP_DISTANCE))
       {
-      *iter_x = x_p + dx;
-      *iter_y = y_p + dy;
-      *iter_z = z_p + dz;
-      *iter_pi = index;
-      *iter_c = dist;
+        *iter_x = x_p + dx;
+        *iter_y = y_p + dy;
+        *iter_z = z_p + dz;
+        *iter_isSafe = true;
+        *iter_pi = index;
+        *iter_c = dist;
 
-      ROS_INFO("Accepted Point (%lu of %lu): (%f ,%f, %f) Parent Index: %lu", pointCount, x_points.size(), *iter_x, *iter_y, *iter_z, (unsigned long) *iter_pi);
-      *iter_rgb = 0x00FF00;
-      ++iter_x; ++iter_y; ++iter_z; ++iter_rgb; ++iter_pi; ++iter_c; ++numberOfNodes; ++pointCount;
+        ROS_INFO("Accepted Point (%lu of %lu): (%f ,%f, %f) Parent Index: %lu", pointCount, x_points.size(), *iter_x, *iter_y, *iter_z, (unsigned long) *iter_pi);
+        *iter_rgb = 0x00FF00;
       } else {
-      /*
-      *iter_x = x_p + dx;
-      *iter_y = y_p + dy;
-      *iter_z = z_p + dz;
-      *iter_pi = index;
-      *iter_c = dist;
+        *iter_x = x_p + dx;
+        *iter_y = y_p + dy;
+        *iter_z = z_p + dz;
+        *iter_isSafe = false;
+        *iter_pi = index;
+        *iter_c = dist;
 
-      ROS_INFO("Rejected Point (%lu of %lu): (%f ,%f, %f) Parent Index: %lu", pointCount, x_points.size(), *iter_x, *iter_y, *iter_z, (unsigned long) *iter_pi);
-      *iter_rgb = 0xFF0000;
-      */
+        ROS_INFO("Rejected Point (%lu of %lu): (%f ,%f, %f) Parent Index: %lu", pointCount, x_points.size(), *iter_x, *iter_y, *iter_z, (unsigned long) *iter_pi);
+        *iter_rgb = 0xFF0000;
       }
     }
     return cloud;
