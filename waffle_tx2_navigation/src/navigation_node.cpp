@@ -191,22 +191,30 @@ namespace TurtleBot3Navigation
     cloud->height = 1;
     
     sensor_msgs::PointCloud2Modifier modifier(*cloud);
-    modifier.setPointCloud2Fields(4, "x", 1, sensor_msgs::PointField::FLOAT32, 
+    // modifier.setPointCloud2FieldsByString(2,"xyz","rgb");
+    modifier.setPointCloud2Fields(4, 
+        "x", 1, sensor_msgs::PointField::FLOAT32, 
         "y", 1, sensor_msgs::PointField::FLOAT32,
         "z", 1, sensor_msgs::PointField::FLOAT32,
         "rgb", 1, sensor_msgs::PointField::FLOAT32);
+    modifier.resize(NUMBER_OF_RRT_NODES); 
     sensor_msgs::PointCloud2Iterator<float> iter_x(*cloud, "x"),
       iter_y(*cloud, "y"),
-      iter_z(*cloud, "z"),
-      iter_rgb(*cloud,"rgb");
-   
+      iter_z(*cloud, "z");
+    sensor_msgs::PointCloud2Iterator<uint8_t> 
+      iter_r(*cloud,"r"), iter_g(*cloud, "g"), iter_b(*cloud, "b");
+  
+    
     for (size_t i = 0; i < (cloud->width)*(cloud->height); ++i) 
     {
       *iter_x = (float) i;
       *iter_y = (float) i;
       *iter_z = (float) i;
-      *iter_rgb = 0xFF0000;
-      ++iter_x; ++iter_y; ++iter_z; ++iter_rgb;
+      *iter_r = 0;
+      *iter_g = 0xff;
+      *iter_b = 0xff;
+      //iter_rgb = 0x00ff00;
+      ++iter_x; ++iter_y; ++iter_z; ++iter_r; ++iter_g; ++iter_b; 
     }
   pub.publish(cloud); 
   }
@@ -423,14 +431,14 @@ namespace TurtleBot3Navigation
     //ROS_INFO("Created initial Point Cloud for generation!");
     //Set the first point as the current location of the robot
     *iter_x = 0;
-    *iter_x = 0; 
-    *iter_x = 0; 
-    *iter_rgb = 0xFF0000;
+    *iter_y = 0; 
+    *iter_z = 0; 
+    *iter_rgb = 0x0000FF;
     *iter_isSafe = true;
     *iter_pi = 0;
     *iter_c = 0;
-    //ROS_INFO("Created initial Point in point cloud!");
-    //ROS_INFO("Point: (%f ,%f, %f) Parent Index: %f", *iter_x, *iter_y, *iter_z, *iter_pi);
+    ROS_INFO("\n\nCreated initial Point in point cloud!");
+    ROS_INFO("Point: (%f ,%f, %f) Parent Index: %f | Color: %06x", *iter_x, *iter_y, *iter_z, *iter_pi, (unsigned int) *iter_rgb);
     
     //Keep track of the amount of RRT Nodes
     size_t numberOfNodes = 1;
@@ -478,9 +486,9 @@ namespace TurtleBot3Navigation
         *iter_isSafe = true;
         *iter_pi = index;
         *iter_c = dist;
-
-        ROS_INFO("Accepted Point (%lu of %lu): (%f ,%f, %f) Parent Index: %lu", pointCount, x_points.size(), *iter_x, *iter_y, *iter_z, (unsigned long) *iter_pi);
         *iter_rgb = 0x00FF00;
+
+        ROS_INFO("Accepted Point (%lu of %lu): (%f ,%f, %f) Parent Index: %lu | color: %06x", pointCount, x_points.size(), *iter_x, *iter_y, *iter_z, (unsigned long) *iter_pi, (unsigned int) *iter_rgb);
       } else {
         *iter_x = x_p + dx;
         *iter_y = y_p + dy;
@@ -488,14 +496,35 @@ namespace TurtleBot3Navigation
         *iter_isSafe = false;
         *iter_pi = index;
         *iter_c = dist;
+        *iter_rgb = 0x0000FF;
 
-        ROS_INFO("Rejected Point (%lu of %lu): (%f ,%f, %f) Parent Index: %lu", pointCount, x_points.size(), *iter_x, *iter_y, *iter_z, (unsigned long) *iter_pi);
-        *iter_rgb = 0xFF0000;
+        ROS_INFO("Rejected Point (%lu of %lu): (%f ,%f, %f) Parent Index: %lu | Color: %06x", pointCount, x_points.size(), *iter_x, *iter_y, *iter_z, (unsigned long) *iter_pi, (unsigned int) *iter_rgb);
       }
     }
     return cloud;
   }
+
+
+  void printCloud(const sensor_msgs::PointCloud2Ptr cloud) {
+    //Create the iterators that will walk through and set each point
+    sensor_msgs::PointCloud2Iterator<float> iter_x(*cloud, "x"),
+      iter_y(*cloud, "y"),
+      iter_z(*cloud, "z"),
+      iter_rgb(*cloud,"rgb"),
+      iter_isSafe(*cloud, "isSafe"),
+      iter_pi(*cloud, "parentIndex"),
+      iter_c(*cloud, "cost");
+
+    unsigned long num_pts = (cloud->width)*(cloud->height);
+    for (unsigned long i = 0; i < num_pts; ++i, ++iter_x, ++iter_y, ++iter_z, ++iter_pi, ++iter_rgb) 
+    {
+        ROS_INFO("Point (%lu of %lu): (%f ,%f, %f) Parent Index: %lu | color: %06x", i, num_pts, *iter_x, *iter_y, *iter_z, (unsigned long) *iter_pi, (unsigned int) *iter_rgb);
+    }
+  }  
 } //Namespace 
+
+
+
 
 using namespace TurtleBot3Navigation;
 int main(int argc, char** argv)
@@ -523,13 +552,18 @@ int main(int argc, char** argv)
     createBoundingboxAndPub(path_pub, BOUND_BOX_MIN_RANGE, BOUND_BOX_MAX_RANGE, BOUND_BOX_Y_AXIS_SLOPE, BOUND_BOX_Y_AXIS_INTERCEPT,
         BOUND_BOX_Z_AXIS_SLOPE, BOUND_BOX_Z_AXIS_INTERCEPT);
    
-    ROS_INFO("Created Bounding Box!");
+    //ROS_INFO("Created Bounding Box!");
     //createCloudAndPub(cloud_pub);
-    sensor_msgs::PointCloud2Ptr cloud = generateRandomInViewCloud(BOUND_BOX_MIN_RANGE, BOUND_BOX_MAX_RANGE, BOUND_BOX_Y_AXIS_SLOPE, 
-        BOUND_BOX_Y_AXIS_INTERCEPT, BOUND_BOX_Z_AXIS_SLOPE, BOUND_BOX_Z_AXIS_INTERCEPT);
-    ROS_INFO("Generated In View Point Cloud!");
-    cloud_pub.publish(cloud);
-    ROS_INFO("Published Point Cloud!");
+    //sensor_msgs::PointCloud2Ptr cloud = generateRandomInViewCloud(BOUND_BOX_MIN_RANGE, BOUND_BOX_MAX_RANGE, BOUND_BOX_Y_AXIS_SLOPE, BOUND_BOX_Y_AXIS_INTERCEPT, BOUND_BOX_Z_AXIS_SLOPE, BOUND_BOX_Z_AXIS_INTERCEPT);
+    createCloudAndPub(cloud_pub);
+    
+    // Test that cloud has all of the data here
+    //printCloud(cloud);
+
+    //Do the tings
+    //ROS_INFO("Generated In View Point Cloud!");
+    //cloud_pub.publish(cloud);
+    //ROS_INFO("Published Point Cloud!");
     loop_rate.sleep();
   }
   return 0;

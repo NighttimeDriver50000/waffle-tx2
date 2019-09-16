@@ -52,6 +52,7 @@ void createCloudAndPub(ros::Publisher& pub);
 float generateRandomValue(float minimum, float maximum);
 sensor_msgs::PointCloud2Ptr generateRandomInViewCloud(float minimumViewPoint, float maximumVeiwPoint, 
       float yAxisBoundarySlope, float yAxisBoundaryIntercept, float zAxisBoundarySlope, float zAxisBoundaryIntercept);
+void printCloud(const sensor_msgs::PointCloud2Ptr cloud);
 
 bool hasNoObsticleCloud = true;
 sensor_msgs::PointCloud2Ptr obstacleCloud;
