@@ -368,7 +368,8 @@ namespace TurtleBot3Navigation
     float dist = calcDistBetweenPoints(point_x1, point_y1, point_z1, point_x2, point_y2, point_z2);
     ROS_INFO("Distance between points: %f", dist);
 
-    //Calculate the Unit Vector
+    //Calculate the unit  vector, where the base is the start point
+    //and the tip is the end point.
     float dx = (point_x2 - point_x1)/dist;
     float dy = (point_y2 - point_y1)/dist;
     float dz = (point_z2 - point_z1)/dist;
@@ -386,26 +387,34 @@ namespace TurtleBot3Navigation
       //print current collision point
       ROS_INFO("Obsticle Point: (%f, %f, %f)", *iter_x, *iter_y, *iter_z);
       
-      //Calculate the Vector between the start and cloud point
-      float dx_sc = point_x1 - *iter_x;
-      float dy_sc = point_y1 - *iter_y;
-      float dz_sc = point_z1 - *iter_z;
+      //Calculate the start vector, where the base is the start point
+      //and the tip is the cloud point.
+      float dx_sc = *iter_x - point_x1;
+      float dy_sc = *iter_y - point_y1;
+      float dz_sc = *iter_z - point_z1;
       tuple<float, float, float> startVector = std::make_tuple(dx_sc, dy_sc, dz_sc);
       ROS_INFO("Start to Obstacle Vector (%f, %f, %f)", dx_sc, dy_sc, dz_sc);
 
-      //Calculate the Vector between the goal and cloud point
-      float dx_gc = point_x2 - *iter_x;
-      float dy_gc = point_y2 - *iter_y;
-      float dz_gc = point_z2 - *iter_z;
+      //Calculate the goal vector, where the base is the start point
+      //and the tip is the cloud point.
+      float dx_gc = *iter_x - point_x2;
+      float dy_gc = *iter_y - point_y2;
+      float dz_gc = *iter_z - point_z2;
       tuple<float, float, float> goalVector = std::make_tuple(dx_gc, dy_gc, dz_gc);
       ROS_INFO("Goal to Obstacle Vector (%f, %f, %f)", dx_gc, dy_gc, dz_gc);
 
-      //Calculate the Dot product between the two vectors and check if negative
-      //This means the point is between the ends of the cylinder
-    
-      float dot = point3dDot(startVector, goalVector);
-      ROS_INFO("Dot Product: %f", dot);
-      if( dot <= 0)
+      //Calculate the Dot product between the start vector and the unit vector.
+      //If positive, this means the cloud point is farther than the start of the cylinder
+      //and is posibly inside the cylinder
+      float dot_su = point3dDot(startVector, unitVector);
+      
+      //Calculate the Dot product between the goal vector and the unit vector 
+      //If negative, this means the cloud point is closer than the end of the cylinder
+      float dot_gu = point3dDot(goalVector, unitVector);
+      ROS_INFO("Dot Product Start Vector and Unit Vector: %f", dot_su);
+      ROS_INFO("Dot Product Goal Vector and Unit Vector: %f", dot_gu);
+      
+      if( dot_su >= 0 && dot_gu <= 0)
       {
         //Calculate the vector cross product with the unit vector
         tuple<float, float, float> cross = point3dCross(goalVector, unitVector);
@@ -419,10 +428,15 @@ namespace TurtleBot3Navigation
         //Divide the Area of the Parallelogram to get the height
         //(unit vector distance is 1); height = area/1 = area
         
-        ROS_INFO("Distance to center of Cylinder: %f < %f", area, minAllowedDistance);
         //Check if the cloud point is inside cylinder, return false for collision.
         if(area < minAllowedDistance)
+        {
+          
+          ROS_INFO("Distance to center of Cylinder: %f < %f", area, minAllowedDistance);
           return false;
+        } else {
+          ROS_INFO("Distance to center of Cylinder: %f > %f", area, minAllowedDistance);
+        }
       }
     }
     return true;
