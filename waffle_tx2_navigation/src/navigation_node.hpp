@@ -57,16 +57,17 @@ namespace TurtleBot3Navigation
   sensor_msgs::PointCloud2Ptr createCloud(void);
 
   //Print a Point Cloud 2
-  void printCloud(const sensor_msgs::PointCloud2Ptr cloud);
+  void printBasicCloud(const sensor_msgs::PointCloud2Ptr cloud);
+  void printSamCloud(const sensor_msgs::PointCloud2Ptr cloud);
   
   //Calculate the Distance between two points
   float calcDistBetweenPoints(tuple<float, float, float> point1, tuple<float, float, float> point2);
-  float calcDistBetweenPoints(sensor_msgs::PointCloud2Ptr cloud, size_t cloudPointIndex, tuple<float, float, float> point2);
+  float calcDistBetweenPoints(sensor_msgs::PointCloud2Ptr cloud, uint32_t cloudPointIndex, tuple<float, float, float> point2);
   float calcDistBetweenPoints(float point_x1, float point_y1, float point_z1, float point_x2, float point_y2, float point_z2);
 
   //Find the closest point in a Point Cloud 2 from a specified point
-  size_t findClosestPoint(sensor_msgs::PointCloud2Ptr cloud, size_t nodesGenerated, float point_x, float point_y, float point_z);
-  size_t findClosestPoint(sensor_msgs::PointCloud2Ptr cloud, size_t nodesGenerated, tuple<float, float, float> p2);
+  uint32_t findClosestPoint(sensor_msgs::PointCloud2Ptr cloud, uint32_t nodesGenerated, float point_x, float point_y, float point_z);
+  uint32_t findClosestPoint(sensor_msgs::PointCloud2Ptr cloud, uint32_t nodesGenerated, tuple<float, float, float> p2);
   
   //Generate Random Floats
   float generateRandomValue(float minimum, float maximum);
@@ -88,11 +89,10 @@ namespace TurtleBot3Navigation
   //Genorate RRT path in camera view
   sensor_msgs::PointCloud2Ptr generateRRTPathInView(float minimumViewPoint, float maximumVeiwPoint, float yAxisBoundarySlope, float yAxisBoundaryIntercept, float zAxisBoundarySlope, float zAxisBoundaryIntercept);
 
-  //Bool to wait for Obsticle Cloud before starting Program
-  bool hasNoObsticleCloud = true;
-  //Point cloud 2, populated by callback, to represent obsticles
+  //Bool to wait for Obstacle Cloud before starting Program
+  bool hasNoObstacleCloud = true;
+  //Point cloud 2, populated by callback, to represent obstacles
   sensor_msgs::PointCloud2Ptr obstacleCloud;
-
 
 };//namespace
 

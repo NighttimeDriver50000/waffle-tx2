@@ -4,7 +4,7 @@ namespace TurtleBot3Navigation
 {
   void cloud_callback(const sensor_msgs::PointCloud2Ptr msg)
   {
-    hasNoObsticleCloud = false;
+    hasNoObstacleCloud = false;
     assert (msg != 0);
 
     //Update the point cloud used for planning
@@ -206,7 +206,7 @@ namespace TurtleBot3Navigation
     sensor_msgs::PointCloud2Iterator<uint8_t> 
       iter_r(*cloud,"r"), iter_g(*cloud, "g"), iter_b(*cloud, "b");
     
-    for (size_t i = 1; i < (cloud->width)*(cloud->height); ++i,  ++iter_x, ++iter_y, ++iter_z, ++iter_r, ++iter_g, ++iter_b) 
+    for (uint32_t i = 1; i < (cloud->width)*(cloud->height); ++i,  ++iter_x, ++iter_y, ++iter_z, ++iter_r, ++iter_g, ++iter_b) 
     {
       *iter_x = (float) i;
       *iter_y = (float) i;
@@ -217,22 +217,46 @@ namespace TurtleBot3Navigation
     }
     return cloud; 
   }
-   
-  void printCloud(const sensor_msgs::PointCloud2Ptr cloud) {
+
+  void printBasicCloud(const sensor_msgs::PointCloud2Ptr cloud) {
     //Create the iterators that will walk through and set each point
     sensor_msgs::PointCloud2Iterator<float> iter_x(*cloud, "x"),
       iter_y(*cloud, "y"),
       iter_z(*cloud, "z"),
-      iter_rgb(*cloud,"rgb"),
-      iter_isSafe(*cloud, "isSafe"),
-      iter_pi(*cloud, "parentIndex"),
-      iter_c(*cloud, "cost");
+      iter_rgb(*cloud,"rgb");
 
     unsigned long num_pts = (cloud->width)*(cloud->height);
-    for (unsigned long i = 0; i < num_pts; ++i, ++iter_x, ++iter_y, ++iter_z, ++iter_pi, ++iter_rgb) 
+    for (unsigned long i = 0; i < num_pts; ++i, ++iter_x, ++iter_y, ++iter_z, ++iter_rgb) 
     {
-        ROS_INFO("Point (%lu of %lu): (%f ,%f, %f) Parent Index: %lu | color: %06x", 
-            i, num_pts, *iter_x, *iter_y, *iter_z, (unsigned long) *iter_pi, (unsigned int) *iter_rgb);
+        ROS_INFO("Point (%lu of %lu): (%f ,%f, %f) | color: %06x", 
+            i, num_pts, *iter_x, *iter_y, *iter_z, (unsigned int) *iter_rgb);
+    }
+  }  
+
+  void printSamCloud(const sensor_msgs::PointCloud2Ptr cloud) {
+    //Create the iterators that will walk through and set each point
+    sensor_msgs::PointCloud2Iterator<float> iter_x(*cloud, "x"),
+      iter_y(*cloud, "y"),
+      iter_z(*cloud, "z"),
+      iter_c(*cloud, "cost");
+   
+    //Create the iterator that will walk through and set the parent index for the tree
+    sensor_msgs::PointCloud2Iterator<uint32_t> iter_pi(*cloud, "parentIndex");
+    
+    //Create the iterators that will walk through and set if the point is safe to travel to
+    //  from the parent indexed point
+    sensor_msgs::PointCloud2Iterator<bool> iter_isSafe(*cloud, "isSafe");
+    
+    //Create RGB modifiers for Color
+    sensor_msgs::PointCloud2Iterator<uint8_t> 
+      iter_r(*cloud,"r"), iter_g(*cloud, "g"), iter_b(*cloud, "b");
+
+
+    unsigned long num_pts = (cloud->width)*(cloud->height);
+    for (unsigned long i = 0; i < num_pts; ++i, ++iter_x, ++iter_y, ++iter_z, ++iter_pi, ++iter_r,++iter_g,++iter_b) 
+    {
+        ROS_INFO("Point (%lu of %lu): (%f ,%f, %f) Parent Index: %u | color: %06x", 
+            i, num_pts, *iter_x, *iter_y, *iter_z, *iter_pi, (unsigned int) (*iter_r<<4)+(*iter_g<<2)+(*iter_b));
     }
   }  
 
@@ -242,7 +266,7 @@ namespace TurtleBot3Navigation
     return calcDistBetweenPoints(std::get<0>(p1), std::get<1>(p1), std::get<2>(p1),
                      std::get<0>(p2), std::get<1>(p2), std::get<2>(p2));
   }
-  float calcDistBetweenPoints(sensor_msgs::PointCloud2Ptr cloud, size_t cloudPointIndex, float point_x, float point_y, float point_z)
+  float calcDistBetweenPoints(sensor_msgs::PointCloud2Ptr cloud, uint32_t cloudPointIndex, float point_x, float point_y, float point_z)
   {
     //Create iterators to walk through the point cloud
     sensor_msgs::PointCloud2Iterator<float> iter_x(*cloud, "x"),
@@ -280,22 +304,22 @@ namespace TurtleBot3Navigation
     return dist;
   }
   
-  size_t findClosestPoint(sensor_msgs::PointCloud2Ptr cloud, size_t nodesGenerated, float point_x, float point_y, float point_z)
+  uint32_t findClosestPoint(sensor_msgs::PointCloud2Ptr cloud, uint32_t nodesGenerated, float point_x, float point_y, float point_z)
   {
     return  findClosestPoint(cloud, nodesGenerated,std::make_tuple(point_x, point_y, point_z));
   }
 
-  size_t findClosestPoint(sensor_msgs::PointCloud2Ptr cloud, size_t nodesGenerated, tuple<float, float, float> p2)
+  uint32_t findClosestPoint(sensor_msgs::PointCloud2Ptr cloud, uint32_t nodesGenerated, tuple<float, float, float> p2)
   { 
     //set index to first point and minimum distance to the first point in the cloud
-    size_t index = 0;
+    uint32_t index = 0;
     float distMin = calcDistBetweenPoints(cloud, 0, get<0>(p2), get<1>(p2), get<2>(p2));
 
     //Is Safe Iter
     sensor_msgs::PointCloud2Iterator<float> iter_isSafe(*cloud, "isSafe");
     
     //walk through the point cloud checking for the minimum distance to the given point
-    for(size_t i = 1; i < nodesGenerated; i++)
+    for(uint32_t i = 1; i < nodesGenerated; i++)
     {
       //use euclidean norm to find distance between the two points
       float dist = calcDistBetweenPoints(cloud, i, get<0>(p2), get<1>(p2), get<2>(p2));
@@ -334,7 +358,7 @@ namespace TurtleBot3Navigation
     sensor_msgs::PointCloud2Iterator<float> iter_x(*cloud, "x"),
       iter_y(*cloud, "y"),
       iter_z(*cloud, "z");
-    for (size_t i = 0; i < (cloud->width)*(cloud->height); ++i) 
+    for (uint32_t i = 0; i < (cloud->width)*(cloud->height); ++i) 
     {
       float dist = calcDistBetweenPoints(cloud, i, point_x, point_y, point_z);
       if(dist < minAllowedDistance)
@@ -353,6 +377,15 @@ namespace TurtleBot3Navigation
       tuple<float, float, float> p2,
       float minAllowedDistance)
   {
+
+    // // Print the cloud
+    // ROS_INFO("===========================================================================");
+    // ROS_INFO(" ");
+    // printBasicCloud(cloud);
+    // ROS_INFO(" ");
+    // ROS_INFO("===========================================================================");
+    
+
     float point_x1 = std::get<0>(p1);
     float point_y1 = std::get<1>(p1);
     float point_z1 = std::get<2>(p1);
@@ -382,60 +415,65 @@ namespace TurtleBot3Navigation
       iter_z(*cloud, "z");
 
     //Walk Trough the Point Cloud
-    for (size_t i = 0; i < (cloud->width)*(cloud->height); ++i) 
+    for (uint32_t i = 0; i < (cloud->width)*(cloud->height); ++i,++iter_x,++iter_y,++iter_z) 
     {
-      //print current collision point
-      ROS_INFO("Obsticle Point: (%f, %f, %f)", *iter_x, *iter_y, *iter_z);
       
-      //Calculate the start vector, where the base is the start point
-      //and the tip is the cloud point.
-      float dx_sc = *iter_x - point_x1;
-      float dy_sc = *iter_y - point_y1;
-      float dz_sc = *iter_z - point_z1;
-      tuple<float, float, float> startVector = std::make_tuple(dx_sc, dy_sc, dz_sc);
-      ROS_INFO("Start to Obstacle Vector (%f, %f, %f)", dx_sc, dy_sc, dz_sc);
-
-      //Calculate the goal vector, where the base is the start point
-      //and the tip is the cloud point.
-      float dx_gc = *iter_x - point_x2;
-      float dy_gc = *iter_y - point_y2;
-      float dz_gc = *iter_z - point_z2;
-      tuple<float, float, float> goalVector = std::make_tuple(dx_gc, dy_gc, dz_gc);
-      ROS_INFO("Goal to Obstacle Vector (%f, %f, %f)", dx_gc, dy_gc, dz_gc);
-
-      //Calculate the Dot product between the start vector and the unit vector.
-      //If positive, this means the cloud point is farther than the start of the cylinder
-      //and is posibly inside the cylinder
-      float dot_su = point3dDot(startVector, unitVector);
-      
-      //Calculate the Dot product between the goal vector and the unit vector 
-      //If negative, this means the cloud point is closer than the end of the cylinder
-      float dot_gu = point3dDot(goalVector, unitVector);
-      ROS_INFO("Dot Product Start Vector and Unit Vector: %f", dot_su);
-      ROS_INFO("Dot Product Goal Vector and Unit Vector: %f", dot_gu);
-      
-      if( dot_su >= 0 && dot_gu <= 0)
+      //Check the values are actual numbers 
+      if (isfinite(*iter_x) && isfinite(*iter_y) && isfinite(*iter_z))
       {
-        //Calculate the vector cross product with the unit vector
-        tuple<float, float, float> cross = point3dCross(goalVector, unitVector);
-  
-        //Calculate the area of the Parallelogram formed with the unit vector (Base) and calculated vector (Side)
-        //as the magnatude of the cross product of these vectors
+        //print current collision point
+        // ROS_INFO("Obstacle Point: (%f, %f, %f)", *iter_x, *iter_y, *iter_z);
         
-        float area = calcDistBetweenPoints(cross, make_tuple(0, 0, 0));
-        ROS_INFO("Area of Parallelogram: %f", area);
+        //Calculate the start vector, where the base is the start point
+        //and the tip is the cloud point.
+        float dx_sc = *iter_x - point_x1;
+        float dy_sc = *iter_y - point_y1;
+        float dz_sc = *iter_z - point_z1;
+        tuple<float, float, float> startVector = std::make_tuple(dx_sc, dy_sc, dz_sc);
+        //ROS_INFO("Start to Obstacle Vector (%f, %f, %f)", dx_sc, dy_sc, dz_sc);
+
+        //Calculate the goal vector, where the base is the start point
+        //and the tip is the cloud point.
+        float dx_gc = *iter_x - point_x2;
+        float dy_gc = *iter_y - point_y2;
+        float dz_gc = *iter_z - point_z2;
+        tuple<float, float, float> goalVector = std::make_tuple(dx_gc, dy_gc, dz_gc);
+        //ROS_INFO("Goal to Obstacle Vector (%f, %f, %f)", dx_gc, dy_gc, dz_gc);
+
+        //Calculate the Dot product between the start vector and the unit vector.
+        //If positive, this means the cloud point is farther than the start of the cylinder
+        //and is posibly inside the cylinder
+        float dot_su = point3dDot(startVector, unitVector);
+        //ROS_INFO("Dot Product Start Vector and Unit Vector: %f", dot_su);
         
-        //Divide the Area of the Parallelogram to get the height
-        //(unit vector distance is 1); height = area/1 = area
+        //Calculate the Dot product between the goal vector and the unit vector 
+        //If negative, this means the cloud point is closer than the end of the cylinder
+        float dot_gu = point3dDot(goalVector, unitVector);
+        //ROS_INFO("Dot Product Goal Vector and Unit Vector: %f", dot_gu);
         
-        //Check if the cloud point is inside cylinder, return false for collision.
-        if(area < minAllowedDistance)
+        if( dot_su >= 0 && dot_gu <= 0)
         {
+          //Calculate the vector cross product with the unit vector
+          tuple<float, float, float> cross = point3dCross(goalVector, unitVector);
+  
+          //Calculate the area of the Parallelogram formed with the unit vector (Base) and calculated vector (Side)
+          //as the magnatude of the cross product of these vectors
           
-          ROS_INFO("Distance to center of Cylinder: %f < %f", area, minAllowedDistance);
-          return false;
-        } else {
-          ROS_INFO("Distance to center of Cylinder: %f > %f", area, minAllowedDistance);
+          float area = calcDistBetweenPoints(cross, make_tuple(0, 0, 0));
+          //ROS_INFO("Area of Parallelogram: %f", area);
+          
+          //Divide the Area of the Parallelogram to get the height
+          //(unit vector distance is 1); height = area/1 = area
+          
+          //Check if the cloud point is inside cylinder, return false for collision.
+          if(area < minAllowedDistance)
+          {
+            
+            //ROS_INFO("Distance to center of Cylinder: %f < %f", area, minAllowedDistance);
+            return false;
+          } else {
+            //ROS_INFO("Distance to center of Cylinder: %f > %f", area, minAllowedDistance);
+          }
         }
       }
     }
@@ -522,7 +560,7 @@ namespace TurtleBot3Navigation
       iter_c(*cloud, "cost");
    
     //Create the iterator that will walk through and set the parent index for the tree
-    sensor_msgs::PointCloud2Iterator<size_t> iter_pi(*cloud, "parentIndex");
+    sensor_msgs::PointCloud2Iterator<uint32_t> iter_pi(*cloud, "parentIndex");
     
     //Create the iterators that will walk through and set if the point is safe to travel to
     //  from the parent indexed point
@@ -544,10 +582,10 @@ namespace TurtleBot3Navigation
     *iter_pi = 0;
     *iter_c = 0;
     ROS_INFO("\n\nCreated initial Point in point cloud!");
-    ROS_INFO("Point: (%f ,%f, %f) Parent Index: %lu | Color: %06x", *iter_x, *iter_y, *iter_z, *iter_pi, (unsigned int) (*iter_r<<4)+(*iter_g<<2)+(*iter_b));
+    ROS_INFO("Point: (%f ,%f, %f) Parent Index: %u | Color: %06x", *iter_x, *iter_y, *iter_z, *iter_pi, (unsigned int) (*iter_r<<4)+(*iter_g<<2)+(*iter_b));
     
     //Keep track of the amount of RRT Nodes
-    size_t numberOfNodes = 1;
+    uint32_t numberOfNodes = 1;
 
     //create the iterators that will acess a point given an index
     sensor_msgs::PointCloud2Iterator<float> it_x(*cloud, "x"),
@@ -557,7 +595,7 @@ namespace TurtleBot3Navigation
     //Generate the x coordinates
     vector<float> x_points = generateRandomValues(((cloud->width)*(cloud->height))-1, minimumViewPoint, maximumViewPoint);
     //ROS_INFO("Genorated x-axis coordinate points!");
-    size_t pointCount = 0;
+    uint32_t pointCount = 0;
     for (float& x : x_points)
     {
       ++iter_x; ++iter_y; ++iter_z; ++iter_r; ++iter_g; ++iter_b; ++iter_pi; ++iter_c; ++numberOfNodes; ++pointCount;
@@ -566,7 +604,9 @@ namespace TurtleBot3Navigation
       float y = generateRandomValue(-yExtreme, yExtreme);
       float zExtreme = zAxisBoundarySlope*(x)+zAxisBoundaryIntercept; 
       float z = generateRandomValue(-zExtreme, zExtreme);
-      size_t index = findClosestPoint(cloud, numberOfNodes, x, y, z);      
+      uint32_t index = findClosestPoint(cloud, numberOfNodes, x, y, z);
+      assert(index <= NUMBER_OF_RRT_NODES);
+      ROS_INFO("this is index: %u", index);
       float dist = calcDistBetweenPoints(cloud, index, x, y, z);
       //ROS_INFO("Random Point: (%f ,%f, %f) Parent Index: %lu Distance: %f", x, y, z, (unsigned long) index, dist);
       
@@ -596,8 +636,8 @@ namespace TurtleBot3Navigation
         *iter_g = 0xFF;
         *iter_b = 0x00;
 
-        ROS_INFO("Accepted Point: (%f ,%f, %f) Parent Index: %lu | Color: %06x", *iter_x, *iter_y, *iter_z, *iter_pi,
-            (unsigned int) (*iter_r<<4)+(*iter_g<<2)+(*iter_b));
+        ROS_INFO("Accepted Point: (%f ,%f, %f) Parent Index: %u | Color: %06x", *iter_x, *iter_y, *iter_z, *iter_pi, (unsigned int) (*iter_r<<4)+(*iter_g<<2)+(*iter_b));
+        ROS_INFO("Accepted Point: (%f ,%f, %f) Parent Index: %u | Color: %06x", *iter_x, *iter_y, *iter_z, index, (unsigned int) (*iter_r<<4)+(*iter_g<<2)+(*iter_b));
       } else {
         *iter_x = x_p + dx;
         *iter_y = y_p + dy;
@@ -609,7 +649,7 @@ namespace TurtleBot3Navigation
         *iter_g = 0x00;
         *iter_b = 0x00;
 
-        ROS_INFO("Rejected Point: (%f ,%f, %f) Parent Index: %lu | Color: %06x", *iter_x, *iter_y, *iter_z, *iter_pi,
+        ROS_INFO("Rejected Point: (%f ,%f, %f) Parent Index: %u | Color: %06x", *iter_x, *iter_y, *iter_z, *iter_pi,
             (unsigned int) (*iter_r<<4)+(*iter_g<<2)+(*iter_b));
       }
     }
@@ -628,29 +668,29 @@ int main(int argc, char** argv)
   ros::Publisher path_pub = node.advertise<nav_msgs::Path>("camera_boundry",1);
   ros::Publisher cloud_pub = node.advertise<sensor_msgs::PointCloud2>("cloud_rrt",1);
   ros::Subscriber pointCloud_sub = node.subscribe("/zed/zed_node/point_cloud/cloud_registered", 1, cloud_callback); 
-  //Wait for obsticle cloud
-  while(hasNoObsticleCloud)
+  //Wait for obstacle cloud
+  while(hasNoObstacleCloud)
   {
     ros::spinOnce();
     ros::Duration(1).sleep(); // sleep in seconds
   }
 
   //Main Loop
-  /*
   while(ros::ok())
   {
     ros::spinOnce();
     ROS_INFO("Spin Once!");
     //createPathAndPub(path_pub);
     createBoundingboxAndPub(path_pub, BOUND_BOX_MIN_RANGE, BOUND_BOX_MAX_RANGE, BOUND_BOX_Y_AXIS_SLOPE, BOUND_BOX_Y_AXIS_INTERCEPT,
-        BOUND_BOX_Z_AXIS_SLOPE, BOUND_BOX_Z_AXIS_INTERCEPT);
-   
+        BOUND_BOX_Z_AXIS_SLOPE, BOUND_BOX_Z_AXIS_INTERCEPT); 
     ROS_INFO("Created Bounding Box!");
-    sensor_msgs::PointCloud2Ptr cloud = generateRandomInViewCloud(BOUND_BOX_MIN_RANGE, BOUND_BOX_MAX_RANGE, BOUND_BOX_Y_AXIS_SLOPE, 
+
+    //Generate RRT Path
+    sensor_msgs::PointCloud2Ptr cloud = generateRRTPathInView(BOUND_BOX_MIN_RANGE, BOUND_BOX_MAX_RANGE, BOUND_BOX_Y_AXIS_SLOPE, 
         BOUND_BOX_Y_AXIS_INTERCEPT, BOUND_BOX_Z_AXIS_SLOPE, BOUND_BOX_Z_AXIS_INTERCEPT);
     
     // Test that cloud has all of the data here
-    //printCloud(cloud);
+    printSamCloud(cloud);
 
     //Do the things
     ROS_INFO("Generated In View Point Cloud!");
@@ -658,10 +698,9 @@ int main(int argc, char** argv)
     ROS_INFO("Published Point Cloud!");
     loop_rate.sleep();
   }
-  */
    
-  bool problem = noCollisionInCylinder(createCloud(), std::make_tuple(0, 0, 0), std::make_tuple(1, 0, 0), 0.5);
-  ROS_INFO("No Collision: %s", problem ? "true" : "false");
+  //bool problem = noCollisionInCylinder(createCloud(), std::make_tuple(0, 0, 0), std::make_tuple(1, 0, 0), 0.5);
+  //ROS_INFO("No Collision: %s", problem ? "true" : "false");
   
   return 0;
 }
