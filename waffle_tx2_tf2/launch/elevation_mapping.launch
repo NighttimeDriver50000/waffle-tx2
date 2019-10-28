@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<launch>
+  <include file="$(find waffle_tx2_tf2)/launch/zed.launch">
+    <arg name="publish_tf" value="true"/>
+    <arg name="base_frame" value="base"/>
+    <arg name="map_frame" value="map"/>
+  </include>
+
+  <group>
+    <remap from="/pose" to="/zed/zed_node/pose"/>
+    <include
+      file="$(find elevation_mapping_demos)/launch/simple_demo.launch"/>
+  </group>
+</launch>
