@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<launch>
+  <!-- Launch ZED Wrapper Node -->
+  <arg name="camera_flip" default="false"/>
+  <arg name="publish_tf" default="true"/>
+
+  <include file="$(find waffle_tx2_tf2)/launch/zed.launch">
+    <arg name="camera_flip" value="$(arg camera_flip)"/>
+    <arg name="publish_tf" value="$(arg publish_tf)"/>
+  </include>
+  <!-- Launch Navigation Node -->
+  <group ns="waffle_tx2">
+    <node name="navigation" pkg="waffle_tx2_navigation" type="navigation_node"/>
+  </group>
+</launch>

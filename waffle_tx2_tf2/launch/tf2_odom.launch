@@ -1,5 +1,6 @@
 <?xml version="1.0"?>
 <launch>
+  <arg name="cartographer" default="1"/>
   <arg name="localize" default="1"/>
   <arg name="gazebo_prefix" default=""/>
   <arg name="tb3_odom_frame" default="$(arg gazebo_prefix)odom"/>
@@ -7,15 +8,11 @@
     name="default_odom_frame" default="$(arg tb3_odom_frame)"/>
   <arg if="$(arg localize)"
     name="default_odom_frame" default="imu_odom"/>
-  <arg name="connect_zed_map" default="1"/>
   <group ns="waffle_tx2">
-    <node name="tf2_odom" pkg="waffle_tx2_tf2" type="tf2_odom_node"
-      args="$(arg default_odom_frame)"/>
+    <node unless="$(arg cartographer)" name="tf2_odom" pkg="waffle_tx2_tf2"
+      type="tf2_odom_node" args="$(arg default_odom_frame)"/>
     <node if="$(arg localize)" name="tf2_odom_sync"
       pkg="waffle_tx2_tf2" type="tf2_sync_odom_node"
-      args="map /tb3/odometry/filtered $(arg tb3_odom_frame) /tb3/odom"/>
-    <node if="$(arg connect_zed_map)" name="tf2_zed_sync"
-      pkg="waffle_tx2_tf2" type="tf2_sync_odom_node"
-      args="map /tb3/odom zed_map /zed/zed_node/odom 0.05 0 0.09 1 0 0"/>
+      args="map /waffle_tx2/odometry/filtered $(arg tb3_odom_frame) /tb3/odom"/>
   </group>
 </launch>

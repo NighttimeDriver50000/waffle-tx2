@@ -20,7 +20,7 @@
       </rosparam>
       <param name="odom0_queue_size" value="4"/>
       <param name="odom0_relative" value="true"/>
-      <param name="imu0" value="/tb3/imu_link"/>
+      <param name="imu0" value="/tb3/imu_linked"/>
       <rosparam param="imu0_config">
         [false, false, false,
          true , true , true ,
@@ -35,7 +35,6 @@
       <param name="publish_acceleration" value="true"/>
       <param name="print_diagnostics" value="true"/>
       <param name="debug" value="true"/>
-      <param name="debug_out_file" value="localize.out"/>
     </node>
   </group>
 </launch>

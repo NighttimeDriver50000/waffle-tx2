@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<launch>
+  <include file="$(find waffle_tx2_tf2)/launch/zed.launch">
+    <arg name="publish_tf" value="true"/>
+    <arg name="base_frame" value="base"/>
+    <arg name="map_frame" value="map"/>
+    <arg name="camera_flip" value="false"/>
+  </include>
+  
+  <group ns="waffle_tx2">
+    <node name="tf2_base" pkg="waffle_tx2_tf2" type="tf2_static_node"
+      args="base base_link 0 0 0 0 0 0"/>
+    <node name="tf2_sensor" pkg="waffle_tx2_tf2" type="tf2_static_node"
+      args="zed_camera_center sensor 0 0 0 0 0 0"/>
+  </group>
+
+  <group>
+    <remap from="/ground_truth_pose" to="/zed/zed_node/pose_with_covariance"/>
+    <remap from="/ground_truth" to="/zed/zed_node/point_cloud/cloud_registered"/>
+    <include
+      file="$(find elevation_mapping_demos)/launch/ground_truth_demo.launch"/>
+  </group>
+</launch>
