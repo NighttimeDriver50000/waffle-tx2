@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<launch>
+  <arg name="port" default="/dev/ttyACM0"/>
+  <arg name="baud" default="9600"/>
+
+  <group ns="gps">
+    <node name="nmea_serial_driver" pkg="nmea_navsat_driver" type="nmea_serial_driver">
+      <param name="port" value="$(arg port)"/>
+      <param name="baud" value="$(arg baud)"/>
+    </node>
+  </group>
+</launch>
