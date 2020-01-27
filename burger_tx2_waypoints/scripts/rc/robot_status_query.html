@@ -1,0 +1,18 @@
+<!doctype html>
+<html>
+    <head>
+        <title>Print Status - Remote Control</title>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+    </head>
+    <body>
+        <p>
+            Note that this will print the status on the server.
+        </p>
+        <form action="/rc" method="post">
+            <input type="hidden" id="msg_type" name="msg_type"
+                value="robot_status_query">
+            <button type="submit">Submit</button>
+        </form>
+    </body>
+</html>

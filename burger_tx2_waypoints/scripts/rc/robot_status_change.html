@@ -1,0 +1,25 @@
+<!doctype html>
+<html>
+    <head>
+        <title>Change Status - Remote Control</title>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+    </head>
+    <body>
+        <p>
+            Change the robot status. Changing to <em>Stopped</em> will clear
+            the waypoint queue.
+        </p>
+        <form action="/rc" method="post">
+            <input type="hidden" id="msg_type" name="msg_type"
+                value="robot_status_change">
+            <select id="change_to_status" name="change_to_status"
+                value="paused">
+                <option selected>Paused</option>
+                <option>Moving</option>
+                <option>Stopped</option>
+            </select>
+            <button type="submit">Submit</button>
+        </form>
+    </body>
+</html>

@@ -1,0 +1,85 @@
+<!doctype html>
+<html>
+    <head>
+        <title>Add Waypoints - Remote Control</title>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <style>
+            input {
+                font-family: monospace;
+            }
+        </style>
+        <script>
+            let maxindex = -1;
+            function renumberWaypoints() {
+                let i = 0;
+                document.querySelectorAll("th.index").forEach(function(iel) {
+                    iel.textContent = i.toString();
+                    i += 1;
+                });
+            }
+            function addWaypoint() {
+                maxindex += 1;
+                let container = document.querySelector("#container");
+                container.insertAdjacentHTML("beforeend", `
+                    <table id="waypoints${maxindex}">
+                        <tr>
+                            <th class="index"></th>
+                            <td><label for="latitudes${maxindex}">
+                                Latitude:
+                            </label></td>
+                            <td><input type="number" id="latitudes${maxindex}"
+                                min="-90" max="90" value="0" step="1e-6"
+                                size="10" name="latitudes"></td>
+                        <tr>
+                            <td><button type="button"
+                                onclick="removeWaypointFromButton(this)">
+                                -
+                            </button></td>
+                            <td><label for="longitudes${maxindex}">
+                                Longitude:
+                            </label></td>
+                            <td><input type="number" id="longitudes${maxindex}"
+                                min="-180" max="180" value="0" step="1e-6"
+                                size="10" name="longitudes"></td>
+                        </tr>
+                    </table>
+                `);
+                renumberWaypoints();
+            }
+            function removeWaypointFromButton(el) {
+                let table = el.parentElement.parentElement.parentElement;
+                table.parentElement.removeChild(table);
+                renumberWaypoints();
+            }
+            function removeAllWaypoints() {
+                let container = document.querySelector("#container");
+                container.innerHTML = "";
+                maxindex = -1;
+            }
+        </script>
+    </head>
+    <body onload="addWaypoint()">
+        <p>
+            Add a group of waypoints to the robot's queue.
+        </p>
+        <form action="/rc" method="post">
+            <p>
+                <label for="waypoints_name">Group Name:</label>
+                <input type="text" id="waypoints_name" name="waypoints_name">
+            </p>
+            <div id="container">
+            </div>
+            <p>
+                <input type="hidden" id="msg_type" name="msg_type"
+                    value="waypoints_travel">
+                <button type="button" onclick="addWaypoint()">+</button>
+                <button type="reset"
+                    onclick="removeAllWaypoints();addWaypoint()">
+                    Reset
+                </button>
+                <button type="submit">Submit</button>
+            </p>
+        </form>
+    </body>
+</html>
